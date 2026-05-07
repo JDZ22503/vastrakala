@@ -32,21 +32,32 @@
         <style>
             :root {
                 --primary: #D1A392;
+                --primary-dark: #7E635A;
                 --bg-cream: #FCF8F3;
+                --white: #FFFFFF;
+                --white-80: rgba(255, 255, 255, 0.8);
+                --white-60: rgba(255, 255, 255, 0.6);
+                --border-soft: rgba(209, 163, 146, 0.2);
+                --text-dark: #4A3F35;
+                --text-light: #7E635A;
             }
-            body { font-family: 'Outfit', sans-serif !important; }
+            body { 
+                font-family: 'Outfit', sans-serif !important; 
+                background-color: var(--bg-cream);
+                color: var(--text-dark);
+            }
             .bg-blush-cream { background-color: var(--bg-cream) !important; }
         </style>
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-blush-cream">
+        <div class="min-h-screen">
             @include('layouts.navigation')
-
+ 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white shadow-sm border-b border-[#D1A392]/20">
+                <header class="bg-white shadow-sm border-b" style="border-color: var(--border-soft);">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        <h2 class="font-semibold text-xl text-[#7E635A] leading-tight" style="font-family: 'Playfair Display', serif;">
+                        <h2 class="font-semibold text-xl leading-tight" style="font-family: 'Playfair Display', serif; color: var(--primary-dark);">
                             {{ $header }}
                         </h2>
                     </div>

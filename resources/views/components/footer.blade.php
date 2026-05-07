@@ -24,6 +24,6 @@
                 <i class="fa-brands fa-instagram"></i>
             </a>
         </div>
-        <p class="copyright">&copy; {{ date('Y') }} {{ config('app.name', 'Vastraकला ') }}. | Hand-Painted with Love <i class="fa-solid fa-heart text-[#D1A392]"></i></p>
+        <p class="copyright">&copy; {{ date('Y') }} {{ config('app.name', 'Vastraकला ') }}. | Hand-Painted with Love <i class="fa-solid fa-heart text-[#D1A392]"></i> | Developed by <a href="https://jenishzalavadiya.dev/" target="_blank" style="color: var(--text-light); font-size: 0.95rem; text-decoration: underline;">Jenish Zalavadiya</a></p>
     </div>
 </footer>

@@ -3,46 +3,47 @@
         {{ config('app.name', 'Vastralkala') }} | {{ __('Product Gallery Management') }}
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center mb-5">
+            <div class="flex justify-between items-center mb-8">
                 <div>
                     <h1 class="text-2xl font-bold text-[#4A403A]" style="font-family: 'Playfair Display', serif;">Manage your creations</h1>
-                    <p class="text-[#7E635A] text-sm">You currently have {{ $galleries->count() }} items listed.</p>
+                    <p class="text-[#7E635A]">You currently have {{ $galleries->count() }} items listed.</p>
                 </div>
                 <x-primary-button onclick="window.location='{{ route('admin.gallery.create') }}'">
-                    Add New <i class="fa-solid fa-plus ml-1"></i>
+                    Add New Item +
                 </x-primary-button>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 @forelse($galleries as $item)
-                    <div class="bg-white rounded-[25px] overflow-hidden shadow-sm border border-transparent hover:border-[#D1A392] transition-all relative group">
-                        <!-- New Arrival Toggle Star -->
-                        <div style="position: absolute; top: 0.5rem; right: 0.5rem; z-index: 50;">
+                    <div class="bg-white rounded-[30px] overflow-hidden shadow-sm border border-transparent hover:border-[#D1A392] transition-all relative group">
+                        <!-- New Arrival Toggle Star (AJAX with direct styles) -->
+                        <div style="position: absolute; top: 1rem; right: 1rem; z-index: 50;">
                             <button type="button" 
                                 data-url="{{ route('admin.gallery.toggle_new_arrival', $item->id) }}"
+                                title="{{ $item->new_arrival ? 'Remove from New Arrivals' : 'Mark as New Arrival' }}" 
                                 class="toggle-new-arrival"
-                                style="width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.12); border: none; cursor: pointer;">
-                                <i class="fa-solid fa-star" style="font-size: 1rem; {{ $item->new_arrival ? 'color: #7E635A;' : 'color: #d1d5db; opacity: 0.6;' }}"></i>
+                                style="width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: none; cursor: pointer; transition: all 0.3s ease;">
+                                <i class="fa-solid fa-star" style="font-size: 1.2rem; {{ $item->new_arrival ? 'color: #7E635A;' : 'color: #d1d5db; opacity: 0.6;' }}"></i>
                             </button>
                         </div>
 
                         @if($item->primaryImage)
                             <img src="{{ asset($item->primaryImage->image_path) }}" alt="{{ $item->title }}" class="w-full aspect-square object-cover">
                         @else
-                            <div class="w-full aspect-square bg-gray-100 flex items-center justify-center text-gray-400 text-[10px]">No image</div>
+                            <div class="w-full aspect-square bg-gray-100 flex items-center justify-center text-gray-400 text-xs">No image</div>
                         @endif
-                        <div class="p-3 text-center">
-                            <span class="text-[0.6rem] uppercase tracking-widest text-[#D1A392] font-bold mb-0.5 block">{{ $item->category->name }}</span>
-                            <h3 class="text-sm font-bold text-[#4A403A] mb-0.5 truncate">{{ $item->title }}</h3>
-                            <p class="text-[10px] leading-tight text-[#7E635A] h-6 overflow-hidden line-clamp-2">{{ $item->description }}</p>
-                            <div class="flex justify-between items-center mt-3 pt-2 border-t border-gray-50">
-                                <a href="{{ route('admin.gallery.edit', $item->id) }}" class="text-[10px] text-[#D1A392] hover:underline font-bold">Edit <i class="fa-solid fa-pen ml-0.5"></i></a>
+                        <div class="p-6 text-center">
+                            <span class="text-[0.7rem] uppercase tracking-widest text-[#D1A392] font-bold mb-1 block">{{ $item->category->name }}</span>
+                            <h3 class="font-bold text-[#4A403A] mb-1 truncate">{{ $item->title }}</h3>
+                            <p class="text-xs text-[#7E635A] h-8 overflow-hidden line-clamp-2">{{ $item->description }}</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <a href="{{ route('admin.gallery.edit', $item->id) }}" class="text-xs text-[#D1A392] hover:underline font-bold">Edit <i class="fa-solid fa-pen ml-1"></i></a>
                                 <form action="{{ route('admin.gallery.destroy', $item->id) }}" method="POST" class="delete-form">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" class="delete-btn text-[10px] text-red-400 hover:underline font-bold">Del <i class="fa-solid fa-trash ml-0.5"></i></button>
+                                    <button type="button" class="delete-btn text-xs text-red-500 hover:underline font-bold">Delete <i class="fa-solid fa-trash ml-1"></i></button>
                                 </form>
                             </div>
                         </div>

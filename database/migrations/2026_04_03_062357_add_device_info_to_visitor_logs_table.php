@@ -1,0 +1,30 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('visitor_logs', function (Blueprint $table) {
+            $table->string('device')->nullable()->after('user_agent');
+            $table->string('os')->nullable()->after('device');
+            $table->string('browser')->nullable()->after('os');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('visitor_logs', function (Blueprint $table) {
+            $table->dropColumn(['device', 'os', 'browser']);
+        });
+    }
+};

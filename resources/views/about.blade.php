@@ -32,7 +32,7 @@
         overflow: hidden;
         box-shadow: var(--shadow-hover);
         z-index: 2;
-        border: 10px solid white;
+        border: 10px solid var(--surface-card);
     }
     .image-main img {
         width: 100%;
@@ -70,7 +70,7 @@
             padding: 0 1rem;
         }
         .section {
-            padding-top: 6rem !important;
+            padding-top: 9rem !important;
         }
     }
 
@@ -81,13 +81,21 @@
         .about-title {
             font-size: 2.2rem;
         }
+        .image-bg {
+            transform: rotate(-5deg) scale(1.02);
+            border-radius: 30px;
+        }
+        .image-main {
+            border-radius: 30px;
+            border-width: 6px;
+        }
     }
 </style>
 @endsection
 
 @section('content')
 <section class="section">
-    <div class="container mt-sm-10">
+    <div class="container mt-5 mt-sm-10">
         <div class="about-grid">
             <div class="image-stack">
                 <div class="image-bg"></div>
@@ -100,24 +108,24 @@
                 <span class="text-primary fw-bold text-uppercase ls-3 small">The Journey</span>
                 <h1 class="about-title">Behind the Art of <span class="text-primary">Vastraकला</span></h1>
                 
-                <p style="font-size: 1.1rem; line-height: 1.8; color: var(--text-light); margin-bottom: 2rem;">
-                    The name Vastraकला  represents more than just a brand; it’s a commitment to preserving the warmth of handmade art in a world of mass production.
+                <p style="font-size: 1.1rem; line-height: 1.8; color: var(--text-body); margin-bottom: 2rem;">
+                    The name Vastraकला represents more than just a brand; it’s a commitment to preserving the warmth of handmade art in a world of mass production.
                 </p>
                 
-                <p style="font-size: 1.05rem; line-height: 1.8; color: var(--text-light); margin-bottom: 2.5rem;">
+                <p style="font-size: 1.05rem; line-height: 1.8; color: var(--text-body); margin-bottom: 2.5rem;">
                     Every T-shirt, quilt, and rumal I design is a canvas where stories come to life. Using high-quality colors and intricate detailing, I ensure that each creation is a unique treasure for your little ones.
                 </p>
 
                 <div class="features-grid">
-                    <div style="background: white; padding: 2rem; border-radius: 30px; box-shadow: var(--shadow-soft);">
-                        <i class="fa-solid fa-heart-pulse" style="color: var(--primary); font-size: 2rem; margin-bottom: 1rem;"></i>
-                        <h3 style="font-family: 'Playfair Display', serif; margin-bottom: 0.5rem; font-size: 1.2rem;">Made with Love</h3>
-                        <p style="font-size: 0.85rem; color: var(--text-light);">Passionate craftsmanship in every single stitch.</p>
+                    <div style="background: var(--surface-card); padding: 2rem; border-radius: 30px; box-shadow: var(--shadow-soft); border: 1px solid var(--glass-border);">
+                        <i class="fa-solid fa-heart-pulse" style="color: var(--accent-main); font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <h3 style="font-family: 'Playfair Display', serif; margin-bottom: 0.5rem; font-size: 1.2rem; color: var(--text-header);">Made with Love</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-body);">Passionate craftsmanship in every single stitch.</p>
                     </div>
-                    <div style="background: white; padding: 2rem; border-radius: 30px; box-shadow: var(--shadow-soft);">
-                        <i class="fa-solid fa-paint-brush" style="color: var(--primary); font-size: 2rem; margin-bottom: 1rem;"></i>
-                        <h3 style="font-family: 'Playfair Display', serif; margin-bottom: 0.5rem; font-size: 1.2rem;">Pure Handmade</h3>
-                        <p style="font-size: 0.85rem; color: var(--text-light);">100% artistic touch with no machine prints.</p>
+                    <div style="background: var(--surface-card); padding: 2rem; border-radius: 30px; box-shadow: var(--shadow-soft); border: 1px solid var(--glass-border);">
+                        <i class="fa-solid fa-paint-brush" style="color: var(--accent-main); font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <h3 style="font-family: 'Playfair Display', serif; margin-bottom: 0.5rem; font-size: 1.2rem; color: var(--text-header);">Pure Handmade</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-body);">100% artistic touch with no machine prints.</p>
                     </div>
                 </div>
             </div>

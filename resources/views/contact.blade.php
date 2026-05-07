@@ -6,7 +6,7 @@
 <style>
     .contact-hero {
         padding: 9rem 0 7rem;
-        background: linear-gradient(rgba(252, 248, 243, 0.8), rgba(252, 248, 243, 0.8)), url('{{ asset("images/bg1.png") }}');
+        background: var(--hero-overlay), url('{{ asset("images/bg1.png") }}');
         background-size: cover;
         background-position: center;
         text-align: center;
@@ -22,13 +22,14 @@
     }
     
     .contact-info-card {
-        background: white;
+        background: var(--surface-card);
         padding: 3.5rem;
         border-radius: 40px;
         box-shadow: var(--shadow-hover);
         height: 100%;
         display: flex;
         flex-direction: column;
+        border: 1px solid var(--glass-border);
     }
     
     .info-item {
@@ -41,8 +42,8 @@
     .info-icon {
         width: 60px;
         height: 60px;
-        background: var(--bg-cream);
-        color: var(--primary);
+        background: var(--surface-accent);
+        color: var(--accent-main);
         border-radius: 20px;
         display: flex;
         align-items: center;
@@ -64,7 +65,7 @@
         overflow: hidden;
         box-shadow: var(--shadow-soft);
         margin-top: 5rem;
-        border: 10px solid white;
+        border: 10px solid var(--surface-card);
     }
     
     @media (max-width: 992px) {
@@ -126,7 +127,7 @@
     <div class="container">
         <span class="text-primary fw-bold text-uppercase ls-3 small">Get in Touch</span>
         <h1 class="display-3 fw-bold mt-2" style="font-family: var(--font-heading);">Contact <span class="text-primary">Us</span></h1>
-        <p class="text-muted mx-auto mt-3" style="max-width: 600px;">
+        <p class="mx-auto mt-3" style="max-width: 600px; color: var(--text-body);">
             We'd love to hear from you. Whether you have a question about our handmade artwork or want a custom painting in any theme, reach out to us!
         </p>
     </div>
@@ -138,15 +139,15 @@
         <div class="contact-grid">
             <!-- Contact Details -->
             <div class="contact-info-card">
-                <h2 class="h3 mb-5" style="font-family: var(--font-heading);">Store Information</h2>
+                <h2 class="h3 mb-5" style="font-family: var(--font-heading);">Business Information</h2>
                 
                 <div class="info-item">
                     <div class="info-icon">
                         <i class="fa-solid fa-location-dot"></i>
                     </div>
                     <div>
-                        <h4 class="h6 text-uppercase fw-bold text-muted ls-1 mb-2">Our Boutique</h4>
-                        <p class="mb-0 text-dark fw-medium">
+                        <h4 class="h6 text-uppercase fw-bold ls-1 mb-2" style="color: var(--text-muted);">Our Boutique</h4>
+                        <p class="mb-0 fw-medium" style="color: var(--text-header);">
                             {{ $settings['address'] ?? 'Shop No. 5, Silver Plaza, Near Main Market, Surat, Gujarat' }}
                         </p>
                     </div>
@@ -157,9 +158,9 @@
                         <i class="fa-solid fa-phone"></i>
                     </div>
                     <div>
-                        <h4 class="h6 text-uppercase fw-bold text-muted ls-1 mb-2">Call Us</h4>
-                        <p class="mb-0 text-dark fw-medium">
-                            <a href="tel:{{ $settings['phone'] ?? '+910000000000' }}" class="text-decoration-none text-dark">
+                        <h4 class="h6 text-uppercase fw-bold ls-1 mb-2" style="color: var(--text-muted);">Call Us</h4>
+                        <p class="mb-0 fw-medium" style="color: var(--text-header);">
+                            <a href="tel:{{ $settings['phone'] ?? '+910000000000' }}" class="text-decoration-none" style="color: var(--text-header);">
                                 {{ $settings['phone'] ?? '+91 00000 00000' }}
                             </a>
                         </p>
@@ -171,9 +172,9 @@
                         <i class="fa-brands fa-whatsapp"></i>
                     </div>
                     <div>
-                        <h4 class="h6 text-uppercase fw-bold text-muted ls-1 mb-2">WhatsApp</h4>
-                        <p class="mb-0 text-dark fw-medium">
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['whatsapp'] ?? '910000000000') }}" target="_blank" class="text-decoration-none text-dark">
+                        <h4 class="h6 text-uppercase fw-bold ls-1 mb-2" style="color: var(--text-muted);">WhatsApp</h4>
+                        <p class="mb-0 fw-medium" style="color: var(--text-header);">
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings['whatsapp'] ?? '910000000000') }}" target="_blank" class="text-decoration-none" style="color: var(--text-header);">
                                 Chat with us directly
                             </a>
                         </p>
@@ -185,9 +186,9 @@
                         <i class="fa-solid fa-envelope"></i>
                     </div>
                     <div>
-                        <h4 class="h6 text-uppercase fw-bold text-muted ls-1 mb-2">Email</h4>
-                        <p class="mb-0 text-dark fw-medium">
-                            <a href="mailto:{{ $settings['email'] ?? 'hello@vastrakala.com' }}" class="text-decoration-none text-dark">
+                        <h4 class="h6 text-uppercase fw-bold ls-1 mb-2" style="color: var(--text-muted);">Email</h4>
+                        <p class="mb-0 fw-medium" style="color: var(--text-header);">
+                            <a href="mailto:{{ $settings['email'] ?? 'hello@vastrakala.com' }}" class="text-decoration-none" style="color: var(--text-header);">
                                 {{ $settings['email'] ?? 'contact@vastrakala.com' }}
                             </a>
                         </p>
@@ -196,20 +197,20 @@
             </div>
 
             <!-- Inquiry Form (Same as Homepage for consistency) -->
-            <div class="contact-info-card" style="background: #fdfaf7; border: 1px solid rgba(126, 98, 88, 0.05);">
-                 <h2 class="h3 mb-5" style="font-family: var(--font-heading);">Send a Message</h2>
+            <div class="contact-info-card">
+                 <h2 class="h3 mb-5" style="font-family: var(--font-heading); color: var(--text-header);">Send a Message</h2>
                   <form id="whatsappInquiryForm2">
                     <div class="form-group mb-4">
-                        <label class="form-label small fw-bold text-uppercase text-muted">Your Name</label>
-                        <input type="text" class="form-control rounded-4 py-3 border-0 bg-white" name="name" id="c_name" placeholder="Full name" required>
+                        <label class="form-label small fw-bold text-uppercase" style="color: var(--text-muted);">Your Name</label>
+                        <input type="text" class="form-control rounded-4 py-3 border-0" name="name" id="c_name" placeholder="Full name" style="background: var(--surface-main); color: var(--text-header);" required>
                     </div>
                     <div class="form-group mb-4">
-                        <label class="form-label small fw-bold text-uppercase text-muted">Phone Number</label>
-                        <input type="tel" class="form-control rounded-4 py-3 border-0 bg-white" name="phone" id="c_phone" placeholder="Mobile number" required>
+                        <label class="form-label small fw-bold text-uppercase" style="color: var(--text-muted);">Phone Number</label>
+                        <input type="tel" class="form-control rounded-4 py-3 border-0" name="phone" id="c_phone" placeholder="Mobile number" style="background: var(--surface-main); color: var(--text-header);" required>
                     </div>
                     <div class="form-group mb-4">
-                        <label class="form-label small fw-bold text-uppercase text-muted">Message</label>
-                        <textarea class="form-control rounded-4 py-3 border-0 bg-white" name="message" id="c_message" rows="4" placeholder="How can we help?" required></textarea>
+                        <label class="form-label small fw-bold text-uppercase" style="color: var(--text-muted);">Message</label>
+                        <textarea class="form-control rounded-4 py-3 border-0" name="message" id="c_message" rows="4" placeholder="How can we help?" style="background: var(--surface-main); color: var(--text-header);" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold text-uppercase ls-1 shadow-sm mt-2">
                         Send to WhatsApp <i class="fa-brands fa-whatsapp ms-2"></i>

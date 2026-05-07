@@ -14,10 +14,14 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
-        $data = $request->except('_token');
+        // Simply process all inputs that come from our form
+        $allInputs = $request->except('_token');
         
-        foreach ($data as $key => $value) {
-            \App\Models\Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+        foreach ($allInputs as $key => $value) {
+            \App\Models\Setting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value]
+            );
         }
 
         return back()->with('success', 'Settings updated successfully! ');

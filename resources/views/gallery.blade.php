@@ -4,7 +4,7 @@
 
 @section('content')
     <section class="section">
-        <div class="container mt-sm-10">
+        <div class="container mt-5 mt-sm-10">
             <div class="filter-nav-container">
                 <select id="gallery-filter" class="filter-dropdown">
                     <option value="all">All Collections</option>
@@ -22,7 +22,7 @@
                             <h2 class="category-title">{{ $category->name }}</h2>
                             <div class="gallery-grid">
                                 @foreach($category->galleries as $item)
-                                    <a href="{{ route('gallery.show', $item->slug) }}" class="card" style="text-decoration: none; color: inherit; display: block;">
+                                    <a href="{{ route('gallery.show', $item->slug) }}" class="card" style="text-decoration: none; color: inherit;">
                                         @if($item->badge)
                                             <span class="card-badge">{{ $item->badge }}</span>
                                         @endif
@@ -30,8 +30,9 @@
                                             @if($item->primaryImage)
                                                 <img
                                                     src="{{ asset($item->primaryImage->image_path) }}"
-                                                    alt="{{ $item->title }}"
+                                                    alt="{{ $item->title }} - Handmade VastraKala Art"
                                                     class="card-img"
+                                                    loading="lazy"
                                                 />
                                             @else
                                                 <div class="card-img" style="background:var(--bg-cream); display:flex; align-items:center; justify-content:center; color:var(--primary-light)">No Image</div>

@@ -1,0 +1,2259 @@
+l · HTML Copy
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Elements Panel</title>
+        <style>
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            :root {
+                --bg: #ffffff;
+                --bg2: #f5f5f7;
+                --bg3: #ececec;
+                --text: #1a1a1a;
+                --text2: #666;
+                --text3: #999;
+                --border: rgba(0, 0, 0, 0.1);
+                --border2: rgba(0, 0, 0, 0.2);
+                --accent: #5b6cf8;
+                --accent-light: #eef0ff;
+                --radius: 8px;
+                --radius-lg: 12px;
+            }
+
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                background: var(--bg2);
+                min-height: 100vh;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                padding: 24px;
+                gap: 24px;
+            }
+
+            /* ── PANEL ── */
+            .panel {
+                width: 280px;
+                min-width: 280px;
+                background: var(--bg);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-lg);
+                overflow: hidden;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+                display: flex;
+                flex-direction: column;
+                max-height: 92vh;
+            }
+
+            /* search */
+            .search-wrap {
+                padding: 12px;
+                border-bottom: 1px solid var(--border);
+                background: var(--bg);
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+            .search-inner {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                background: var(--bg2);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 7px 10px;
+            }
+            .search-inner svg {
+                flex-shrink: 0;
+                color: var(--text3);
+            }
+            .search-inner input {
+                border: none;
+                background: transparent;
+                outline: none;
+                font-size: 13px;
+                color: var(--text);
+                width: 100%;
+            }
+            .search-inner input::placeholder {
+                color: var(--text3);
+            }
+
+            /* tabs */
+            .tabs {
+                display: flex;
+                border-bottom: 1px solid var(--border);
+                overflow-x: auto;
+                scrollbar-width: none;
+                background: var(--bg);
+                position: sticky;
+                top: 57px;
+                z-index: 9;
+            }
+            .tabs::-webkit-scrollbar {
+                display: none;
+            }
+            .tab {
+                padding: 9px 13px;
+                font-size: 12px;
+                font-weight: 500;
+                color: var(--text2);
+                cursor: pointer;
+                white-space: nowrap;
+                border-bottom: 2px solid transparent;
+                transition: all 0.15s;
+                user-select: none;
+            }
+            .tab:hover {
+                color: var(--text);
+            }
+            .tab.active {
+                color: var(--accent);
+                border-bottom-color: var(--accent);
+            }
+
+            /* scrollable content */
+            .panel-body {
+                overflow-y: auto;
+                flex: 1;
+                scrollbar-width: thin;
+                scrollbar-color: var(--border2) transparent;
+            }
+            .panel-body::-webkit-scrollbar {
+                width: 4px;
+            }
+            .panel-body::-webkit-scrollbar-thumb {
+                background: var(--border2);
+                border-radius: 4px;
+            }
+
+            /* section */
+            .section {
+                padding: 12px 12px 4px;
+            }
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 9px;
+            }
+            .section-title {
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text);
+            }
+            .see-all {
+                font-size: 11px;
+                color: var(--accent);
+                cursor: pointer;
+            }
+            .see-all:hover {
+                text-decoration: underline;
+            }
+
+            .divider {
+                height: 1px;
+                background: var(--border);
+                margin: 2px 12px;
+            }
+
+            /* grids */
+            .grid-2 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+            .grid-3 {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+            .grid-4 {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 5px;
+                margin-bottom: 8px;
+            }
+
+            /* element card */
+            .el {
+                background: var(--bg2);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 10px 6px 8px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+                cursor: pointer;
+                transition: all 0.15s;
+                user-select: none;
+            }
+            .el:hover {
+                border-color: var(--accent);
+                background: var(--accent-light);
+            }
+            .el:active {
+                transform: scale(0.96);
+            }
+            .el svg {
+                flex-shrink: 0;
+            }
+            .el-label {
+                font-size: 10px;
+                color: var(--text2);
+                text-align: center;
+                line-height: 1.3;
+            }
+
+            /* row element card */
+            .el-row {
+                background: var(--bg2);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 8px 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+                transition: all 0.15s;
+                user-select: none;
+            }
+            .el-row:hover {
+                border-color: var(--accent);
+                background: var(--accent-light);
+            }
+            .el-row:active {
+                transform: scale(0.98);
+            }
+            .el-row .el-label {
+                text-align: left;
+                font-size: 11px;
+                color: var(--text);
+            }
+
+            /* preview rect */
+            .preview {
+                width: 100%;
+                height: 54px;
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+                cursor: pointer;
+                transition: border-color 0.15s;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--bg2);
+            }
+            .preview:hover {
+                border-color: var(--accent);
+            }
+
+            /* badges row */
+            .badges {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                margin-bottom: 8px;
+            }
+            .badge {
+                font-size: 10px;
+                padding: 3px 9px;
+                border-radius: 20px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: opacity 0.15s;
+            }
+            .badge:hover {
+                opacity: 0.8;
+            }
+
+            /* tooltip on hover */
+            .el[title]:hover::after {
+                content: attr(title);
+                position: absolute;
+                background: #1a1a1a;
+                color: #fff;
+                font-size: 10px;
+                padding: 3px 7px;
+                border-radius: 4px;
+                white-space: nowrap;
+                pointer-events: none;
+                z-index: 100;
+                margin-top: 4px;
+            }
+
+            /* ── INFO COLUMN ── */
+            .info {
+                flex: 1;
+                max-width: 340px;
+                min-width: 220px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding-top: 4px;
+            }
+            .info h2 {
+                font-size: 18px;
+                font-weight: 700;
+                color: var(--text);
+                margin-bottom: 4px;
+            }
+            .info p {
+                font-size: 13px;
+                color: var(--text2);
+                line-height: 1.6;
+            }
+
+            .cat-list {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                margin-top: 4px;
+            }
+            .cat-item {
+                background: var(--bg);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 9px 12px;
+                font-size: 12px;
+                color: var(--text2);
+                line-height: 1.5;
+            }
+            .cat-item strong {
+                color: var(--text);
+                font-weight: 600;
+            }
+
+            .add-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: var(--accent);
+                color: #fff;
+                border: none;
+                border-radius: var(--radius);
+                padding: 10px 16px;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                transition:
+                    opacity 0.15s,
+                    transform 0.1s;
+                margin-top: 4px;
+                width: 100%;
+                justify-content: center;
+            }
+            .add-btn:hover {
+                opacity: 0.9;
+            }
+            .add-btn:active {
+                transform: scale(0.98);
+            }
+        </style>
+    </head>
+    <body>
+        <!-- ── ELEMENTS PANEL ── -->
+        <div class="panel">
+            <div class="search-wrap">
+                <div class="search-inner">
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input
+                        id="search"
+                        placeholder="Search elements..."
+                        oninput="filterElements(this.value)"
+                    />
+                    <svg
+                        id="clear-btn"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        style="cursor: pointer; display: none"
+                        onclick="clearSearch()"
+                    >
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab(this, 'all')">
+                    All
+                </div>
+                <div class="tab" onclick="switchTab(this, 'shapes')">
+                    Shapes
+                </div>
+                <div class="tab" onclick="switchTab(this, 'frames')">
+                    Frames
+                </div>
+                <div class="tab" onclick="switchTab(this, 'icons')">Icons</div>
+                <div class="tab" onclick="switchTab(this, 'charts')">
+                    Charts
+                </div>
+                <div class="tab" onclick="switchTab(this, 'ui')">UI</div>
+                <div class="tab" onclick="switchTab(this, 'deco')">Deco</div>
+            </div>
+
+            <div class="panel-body" id="panel-body">
+                <!-- SHAPES -->
+                <div class="section" data-cat="shapes">
+                    <div class="section-header">
+                        <span class="section-title">Shapes</span>
+                        <span class="see-all">See all</span>
+                    </div>
+                    <div class="grid-4">
+                        <div class="el" data-name="circle">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <circle
+                                    cx="11"
+                                    cy="11"
+                                    r="9"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                            </svg>
+                            <span class="el-label">Circle</span>
+                        </div>
+                        <div class="el" data-name="square">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <rect
+                                    x="2"
+                                    y="2"
+                                    width="18"
+                                    height="18"
+                                    rx="1.5"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                            </svg>
+                            <span class="el-label">Square</span>
+                        </div>
+                        <div class="el" data-name="rectangle">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <rect
+                                    x="1"
+                                    y="5"
+                                    width="20"
+                                    height="12"
+                                    rx="1.5"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                            </svg>
+                            <span class="el-label">Rect</span>
+                        </div>
+                        <div class="el" data-name="triangle">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <polygon
+                                    points="11,2 20,20 2,20"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                            </svg>
+                            <span class="el-label">Triangle</span>
+                        </div>
+                        <div class="el" data-name="star">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <polygon
+                                    points="11,2 13.5,8.5 20,9 15.2,13.5 16.8,20 11,16.5 5.2,20 6.8,13.5 2,9 8.5,8.5"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">Star</span>
+                        </div>
+                        <div class="el" data-name="blob">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <path
+                                    d="M11 2 Q17 2 18 8 Q22 10 20 15 Q18 20 13 20 Q10 22 8 20 Q4 19 3 14 Q0 10 4 7 Q5 2 11 2Z"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">Blob</span>
+                        </div>
+                        <div class="el" data-name="hexagon">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <polygon
+                                    points="11,2 19,6.5 19,15.5 11,20 3,15.5 3,6.5"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">Hexagon</span>
+                        </div>
+                        <div class="el" data-name="diamond">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <polygon
+                                    points="11,2 20,11 11,20 2,11"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">Diamond</span>
+                        </div>
+                        <div class="el" data-name="pentagon">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <polygon
+                                    points="11,2 20,8.5 16.5,19 5.5,19 2,8.5"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">Pentagon</span>
+                        </div>
+                        <div class="el" data-name="rounded rectangle">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <rect
+                                    x="1"
+                                    y="5"
+                                    width="20"
+                                    height="12"
+                                    rx="5"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                            </svg>
+                            <span class="el-label">Pill</span>
+                        </div>
+                        <div class="el" data-name="cross">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <path
+                                    d="M8,2 h6 v6 h6 v6 h-6 v6 h-6 v-6 h-6 v-6 h6Z"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">Cross</span>
+                        </div>
+                        <div class="el" data-name="arrow shape">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <path
+                                    d="M2,9 h12 v-4 l7,6 -7,6 v-4 h-12Z"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">Arrow</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- FRAMES -->
+                <div class="section" data-cat="frames">
+                    <div class="section-header">
+                        <span class="section-title">Frames</span>
+                        <span class="see-all">See all</span>
+                    </div>
+                    <div class="grid-4">
+                        <div class="el" data-name="phone frame">
+                            <svg width="18" height="22" viewBox="0 0 18 28">
+                                <rect
+                                    x="1"
+                                    y="1"
+                                    width="16"
+                                    height="26"
+                                    rx="3"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                                <line
+                                    x1="6"
+                                    y1="25"
+                                    x2="12"
+                                    y2="25"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                                <rect
+                                    x="7"
+                                    y="3"
+                                    width="4"
+                                    height="1.5"
+                                    rx="0.75"
+                                    fill="#555"
+                                />
+                            </svg>
+                            <span class="el-label">Phone</span>
+                        </div>
+                        <div class="el" data-name="laptop frame">
+                            <svg width="22" height="18" viewBox="0 0 26 20">
+                                <rect
+                                    x="2"
+                                    y="1"
+                                    width="22"
+                                    height="14"
+                                    rx="2"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                                <path
+                                    d="M0,17 Q13,15 26,17"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">Laptop</span>
+                        </div>
+                        <div class="el" data-name="browser frame">
+                            <svg width="22" height="18" viewBox="0 0 24 18">
+                                <rect
+                                    x="1"
+                                    y="1"
+                                    width="22"
+                                    height="16"
+                                    rx="2"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                                <line
+                                    x1="1"
+                                    y1="5.5"
+                                    x2="23"
+                                    y2="5.5"
+                                    stroke="#555"
+                                    stroke-width="1.2"
+                                />
+                                <circle cx="4.5" cy="3.2" r="1" fill="#555" />
+                                <circle cx="7.5" cy="3.2" r="1" fill="#555" />
+                                <circle cx="10.5" cy="3.2" r="1" fill="#555" />
+                            </svg>
+                            <span class="el-label">Browser</span>
+                        </div>
+                        <div class="el" data-name="ipad tablet frame">
+                            <svg width="16" height="22" viewBox="0 0 18 26">
+                                <rect
+                                    x="1"
+                                    y="1"
+                                    width="16"
+                                    height="24"
+                                    rx="2.5"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                                <circle cx="9" cy="23" r="1" fill="#555" />
+                            </svg>
+                            <span class="el-label">iPad</span>
+                        </div>
+                        <div class="el" data-name="circle frame">
+                            <svg width="22" height="22" viewBox="0 0 22 22">
+                                <circle
+                                    cx="11"
+                                    cy="11"
+                                    r="9"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="2.5"
+                                    stroke-dasharray="2 1"
+                                />
+                            </svg>
+                            <span class="el-label">Circle</span>
+                        </div>
+                        <div class="el" data-name="imac desktop frame">
+                            <svg width="22" height="20" viewBox="0 0 26 22">
+                                <rect
+                                    x="1"
+                                    y="1"
+                                    width="24"
+                                    height="16"
+                                    rx="2"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                                <line
+                                    x1="8"
+                                    y1="19"
+                                    x2="18"
+                                    y2="19"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                                <line
+                                    x1="13"
+                                    y1="17"
+                                    x2="13"
+                                    y2="19"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">iMac</span>
+                        </div>
+                        <div class="el" data-name="polaroid photo frame">
+                            <svg width="18" height="22" viewBox="0 0 18 22">
+                                <rect
+                                    x="1"
+                                    y="1"
+                                    width="16"
+                                    height="20"
+                                    rx="1.5"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                                <rect
+                                    x="3"
+                                    y="3"
+                                    width="12"
+                                    height="10"
+                                    rx="1"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1"
+                                />
+                            </svg>
+                            <span class="el-label">Polaroid</span>
+                        </div>
+                        <div class="el" data-name="tv screen frame">
+                            <svg width="22" height="18" viewBox="0 0 24 20">
+                                <rect
+                                    x="1"
+                                    y="1"
+                                    width="22"
+                                    height="15"
+                                    rx="2"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.6"
+                                />
+                                <path
+                                    d="M8,17 L7,20 M16,17 L17,20"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">TV</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- LINES -->
+                <div class="section" data-cat="shapes">
+                    <div class="section-header">
+                        <span class="section-title">Lines &amp; arrows</span>
+                        <span class="see-all">See all</span>
+                    </div>
+                    <div class="grid-4">
+                        <div class="el" data-name="straight line">
+                            <svg width="22" height="14" viewBox="0 0 24 14">
+                                <line
+                                    x1="2"
+                                    y1="7"
+                                    x2="22"
+                                    y2="7"
+                                    stroke="#555"
+                                    stroke-width="1.8"
+                                />
+                            </svg>
+                            <span class="el-label">Line</span>
+                        </div>
+                        <div class="el" data-name="arrow line">
+                            <svg width="22" height="14" viewBox="0 0 24 14">
+                                <line
+                                    x1="2"
+                                    y1="7"
+                                    x2="17"
+                                    y2="7"
+                                    stroke="#555"
+                                    stroke-width="1.8"
+                                />
+                                <polygon points="17,4 22,7 17,10" fill="#555" />
+                            </svg>
+                            <span class="el-label">Arrow</span>
+                        </div>
+                        <div class="el" data-name="curved line">
+                            <svg width="22" height="14" viewBox="0 0 24 14">
+                                <path
+                                    d="M2,11 Q12,2 22,11"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.8"
+                                />
+                            </svg>
+                            <span class="el-label">Curve</span>
+                        </div>
+                        <div class="el" data-name="dashed line">
+                            <svg width="22" height="14" viewBox="0 0 24 14">
+                                <line
+                                    x1="2"
+                                    y1="7"
+                                    x2="22"
+                                    y2="7"
+                                    stroke="#555"
+                                    stroke-width="1.8"
+                                    stroke-dasharray="4,3"
+                                />
+                            </svg>
+                            <span class="el-label">Dashed</span>
+                        </div>
+                        <div class="el" data-name="double arrow">
+                            <svg width="22" height="14" viewBox="0 0 24 14">
+                                <polygon points="7,4 2,7 7,10" fill="#555" />
+                                <line
+                                    x1="2"
+                                    y1="7"
+                                    x2="22"
+                                    y2="7"
+                                    stroke="#555"
+                                    stroke-width="1.8"
+                                />
+                                <polygon points="17,4 22,7 17,10" fill="#555" />
+                            </svg>
+                            <span class="el-label">Double</span>
+                        </div>
+                        <div class="el" data-name="wavy line">
+                            <svg width="22" height="14" viewBox="0 0 24 14">
+                                <path
+                                    d="M2,7 Q5,3 8,7 Q11,11 14,7 Q17,3 20,7 Q22,9 22,7"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.8"
+                                />
+                            </svg>
+                            <span class="el-label">Wavy</span>
+                        </div>
+                        <div class="el" data-name="dotted line">
+                            <svg width="22" height="14" viewBox="0 0 24 14">
+                                <line
+                                    x1="2"
+                                    y1="7"
+                                    x2="22"
+                                    y2="7"
+                                    stroke="#555"
+                                    stroke-width="2"
+                                    stroke-dasharray="1,4"
+                                    stroke-linecap="round"
+                                />
+                            </svg>
+                            <span class="el-label">Dotted</span>
+                        </div>
+                        <div class="el" data-name="elbow connector">
+                            <svg width="22" height="14" viewBox="0 0 24 14">
+                                <path
+                                    d="M2,11 L12,11 L12,3 L22,3"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.8"
+                                />
+                            </svg>
+                            <span class="el-label">Elbow</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- ICONS -->
+                <div class="section" data-cat="icons">
+                    <div class="section-header">
+                        <span class="section-title">Icons</span>
+                        <span class="see-all">See all</span>
+                    </div>
+                    <div class="grid-4">
+                        <div class="el" data-name="home icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <path
+                                    d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                                />
+                                <polyline points="9,22 9,12 15,12 15,22" />
+                            </svg>
+                            <span class="el-label">Home</span>
+                        </div>
+                        <div class="el" data-name="search icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <span class="el-label">Search</span>
+                        </div>
+                        <div class="el" data-name="user person icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <path
+                                    d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"
+                                />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            <span class="el-label">User</span>
+                        </div>
+                        <div class="el" data-name="heart like icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <path
+                                    d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+                                />
+                            </svg>
+                            <span class="el-label">Heart</span>
+                        </div>
+                        <div class="el" data-name="email mail icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <path
+                                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                                />
+                                <polyline points="22,6 12,13 2,6" />
+                            </svg>
+                            <span class="el-label">Email</span>
+                        </div>
+                        <div class="el" data-name="map pin location icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <path
+                                    d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
+                                />
+                                <circle cx="12" cy="10" r="3" />
+                            </svg>
+                            <span class="el-label">Pin</span>
+                        </div>
+                        <div class="el" data-name="clock time icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12,6 12,12 16,14" />
+                            </svg>
+                            <span class="el-label">Clock</span>
+                        </div>
+                        <div class="el" data-name="phone call icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <path
+                                    d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.64A2 2 0 012 .82h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"
+                                />
+                            </svg>
+                            <span class="el-label">Phone</span>
+                        </div>
+                        <div class="el" data-name="share upload icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <path
+                                    d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"
+                                />
+                                <polyline points="16,6 12,2 8,6" />
+                                <line x1="12" y1="2" x2="12" y2="15" />
+                            </svg>
+                            <span class="el-label">Share</span>
+                        </div>
+                        <div class="el" data-name="settings gear icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <circle cx="12" cy="12" r="3" />
+                                <path
+                                    d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+                                />
+                            </svg>
+                            <span class="el-label">Settings</span>
+                        </div>
+                        <div class="el" data-name="notification bell icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <path
+                                    d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"
+                                />
+                                <path d="M13.73 21a2 2 0 01-3.46 0" />
+                            </svg>
+                            <span class="el-label">Bell</span>
+                        </div>
+                        <div class="el" data-name="lock security icon">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <rect
+                                    x="3"
+                                    y="11"
+                                    width="18"
+                                    height="11"
+                                    rx="2"
+                                    ry="2"
+                                />
+                                <path d="M7 11V7a5 5 0 0110 0v4" />
+                            </svg>
+                            <span class="el-label">Lock</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- CHARTS -->
+                <div class="section" data-cat="charts">
+                    <div class="section-header">
+                        <span class="section-title">Charts &amp; data</span>
+                        <span class="see-all">See all</span>
+                    </div>
+                    <div class="grid-4">
+                        <div class="el" data-name="bar chart">
+                            <svg width="22" height="18" viewBox="0 0 24 18">
+                                <rect
+                                    x="1"
+                                    y="11"
+                                    width="4"
+                                    height="6"
+                                    fill="#bbb"
+                                />
+                                <rect
+                                    x="7"
+                                    y="7"
+                                    width="4"
+                                    height="10"
+                                    fill="#888"
+                                />
+                                <rect
+                                    x="13"
+                                    y="4"
+                                    width="4"
+                                    height="13"
+                                    fill="#555"
+                                />
+                                <rect
+                                    x="19"
+                                    y="9"
+                                    width="4"
+                                    height="8"
+                                    fill="#aaa"
+                                />
+                            </svg>
+                            <span class="el-label">Bar chart</span>
+                        </div>
+                        <div class="el" data-name="line chart graph">
+                            <svg width="22" height="18" viewBox="0 0 24 18">
+                                <polyline
+                                    points="2,15 6,10 10,12 14,5 18,8 22,4"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.8"
+                                />
+                                <circle cx="2" cy="15" r="1.5" fill="#555" />
+                                <circle cx="6" cy="10" r="1.5" fill="#555" />
+                                <circle cx="10" cy="12" r="1.5" fill="#555" />
+                                <circle cx="14" cy="5" r="1.5" fill="#555" />
+                                <circle cx="18" cy="8" r="1.5" fill="#555" />
+                                <circle cx="22" cy="4" r="1.5" fill="#555" />
+                            </svg>
+                            <span class="el-label">Line chart</span>
+                        </div>
+                        <div class="el" data-name="pie chart">
+                            <svg width="22" height="20" viewBox="0 0 22 22">
+                                <path
+                                    d="M11,11 L11,2 A9,9 0 0,1 18.4,6.5Z"
+                                    fill="#555"
+                                />
+                                <path
+                                    d="M11,11 L18.4,6.5 A9,9 0 0,1 11,20Z"
+                                    fill="#888"
+                                />
+                                <path
+                                    d="M11,11 L11,20 A9,9 0 0,1 2,11Z"
+                                    fill="#bbb"
+                                />
+                                <path
+                                    d="M11,11 L2,11 A9,9 0 0,1 11,2Z"
+                                    fill="#ddd"
+                                />
+                            </svg>
+                            <span class="el-label">Pie chart</span>
+                        </div>
+                        <div class="el" data-name="donut chart">
+                            <svg width="22" height="20" viewBox="0 0 22 22">
+                                <circle
+                                    cx="11"
+                                    cy="11"
+                                    r="8"
+                                    fill="none"
+                                    stroke="#ddd"
+                                    stroke-width="5"
+                                />
+                                <circle
+                                    cx="11"
+                                    cy="11"
+                                    r="8"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="5"
+                                    stroke-dasharray="18 32"
+                                    stroke-dashoffset="-6"
+                                />
+                                <circle
+                                    cx="11"
+                                    cy="11"
+                                    r="8"
+                                    fill="none"
+                                    stroke="#888"
+                                    stroke-width="5"
+                                    stroke-dasharray="12 38"
+                                    stroke-dashoffset="-24"
+                                />
+                            </svg>
+                            <span class="el-label">Donut</span>
+                        </div>
+                        <div class="el" data-name="area chart">
+                            <svg width="22" height="18" viewBox="0 0 24 18">
+                                <path
+                                    d="M2,15 L6,10 L10,12 L14,5 L18,8 L22,4 L22,16 L2,16Z"
+                                    fill="#ddd"
+                                />
+                                <polyline
+                                    points="2,15 6,10 10,12 14,5 18,8 22,4"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="1.8"
+                                />
+                            </svg>
+                            <span class="el-label">Area</span>
+                        </div>
+                        <div class="el" data-name="radar spider chart">
+                            <svg width="22" height="20" viewBox="0 0 22 22">
+                                <polygon
+                                    points="11,2 19,7 19,15 11,20 3,15 3,7"
+                                    fill="none"
+                                    stroke="#ccc"
+                                    stroke-width="1"
+                                />
+                                <polygon
+                                    points="11,5 16,8.5 16,13.5 11,17 6,13.5 6,8.5"
+                                    fill="none"
+                                    stroke="#ccc"
+                                    stroke-width="1"
+                                />
+                                <polygon
+                                    points="11,6 15,9 15,13 11,16 7,13 7,9"
+                                    fill="#ddd"
+                                    stroke="#555"
+                                    stroke-width="1.4"
+                                />
+                            </svg>
+                            <span class="el-label">Radar</span>
+                        </div>
+                        <div class="el" data-name="gauge meter chart">
+                            <svg width="22" height="14" viewBox="0 0 24 14">
+                                <path
+                                    d="M2,13 A10,10 0 0,1 22,13"
+                                    fill="none"
+                                    stroke="#ddd"
+                                    stroke-width="3"
+                                />
+                                <path
+                                    d="M2,13 A10,10 0 0,1 16,4"
+                                    fill="none"
+                                    stroke="#555"
+                                    stroke-width="3"
+                                />
+                                <line
+                                    x1="12"
+                                    y1="13"
+                                    x2="16"
+                                    y2="5"
+                                    stroke="#e55"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">Gauge</span>
+                        </div>
+                        <div class="el" data-name="scatter plot chart">
+                            <svg width="22" height="18" viewBox="0 0 24 18">
+                                <circle cx="5" cy="13" r="2" fill="#555" />
+                                <circle cx="9" cy="8" r="2" fill="#555" />
+                                <circle cx="13" cy="12" r="2" fill="#555" />
+                                <circle cx="17" cy="5" r="2" fill="#555" />
+                                <circle cx="20" cy="9" r="2" fill="#555" />
+                                <circle cx="7" cy="4" r="2" fill="#888" />
+                            </svg>
+                            <span class="el-label">Scatter</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- UI ELEMENTS -->
+                <div class="section" data-cat="ui">
+                    <div class="section-header">
+                        <span class="section-title">UI elements</span>
+                        <span class="see-all">See all</span>
+                    </div>
+                    <div class="grid-2">
+                        <div class="el-row" data-name="progress bar">
+                            <div
+                                style="
+                                    flex: 1;
+                                    height: 7px;
+                                    background: #e5e5e5;
+                                    border-radius: 4px;
+                                    position: relative;
+                                "
+                            >
+                                <div
+                                    style="
+                                        width: 65%;
+                                        height: 100%;
+                                        background: #5b6cf8;
+                                        border-radius: 4px;
+                                    "
+                                ></div>
+                            </div>
+                            <span class="el-label">Progress</span>
+                        </div>
+                        <div class="el-row" data-name="toggle switch">
+                            <div
+                                style="
+                                    width: 30px;
+                                    height: 16px;
+                                    background: #5b6cf8;
+                                    border-radius: 8px;
+                                    position: relative;
+                                    flex-shrink: 0;
+                                "
+                            >
+                                <div
+                                    style="
+                                        width: 12px;
+                                        height: 12px;
+                                        background: #fff;
+                                        border-radius: 50%;
+                                        position: absolute;
+                                        right: 2px;
+                                        top: 2px;
+                                    "
+                                ></div>
+                            </div>
+                            <span class="el-label">Toggle</span>
+                        </div>
+                        <div class="el-row" data-name="checkbox check">
+                            <div
+                                style="
+                                    width: 16px;
+                                    height: 16px;
+                                    border: 2px solid #5b6cf8;
+                                    border-radius: 4px;
+                                    background: #5b6cf8;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    flex-shrink: 0;
+                                "
+                            >
+                                <svg width="10" height="10" viewBox="0 0 10 10">
+                                    <polyline
+                                        points="1,5 4,8 9,2"
+                                        fill="none"
+                                        stroke="#fff"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                    />
+                                </svg>
+                            </div>
+                            <span class="el-label">Checkbox</span>
+                        </div>
+                        <div class="el-row" data-name="radio button">
+                            <div
+                                style="
+                                    width: 16px;
+                                    height: 16px;
+                                    border: 2px solid #5b6cf8;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    flex-shrink: 0;
+                                "
+                            >
+                                <div
+                                    style="
+                                        width: 7px;
+                                        height: 7px;
+                                        background: #5b6cf8;
+                                        border-radius: 50%;
+                                    "
+                                ></div>
+                            </div>
+                            <span class="el-label">Radio</span>
+                        </div>
+                        <div class="el-row" data-name="slider range input">
+                            <div
+                                style="
+                                    flex: 1;
+                                    height: 5px;
+                                    background: #e5e5e5;
+                                    border-radius: 3px;
+                                    position: relative;
+                                "
+                            >
+                                <div
+                                    style="
+                                        width: 55%;
+                                        height: 100%;
+                                        background: #5b6cf8;
+                                        border-radius: 3px;
+                                    "
+                                ></div>
+                                <div
+                                    style="
+                                        width: 14px;
+                                        height: 14px;
+                                        background: #5b6cf8;
+                                        border-radius: 50%;
+                                        position: absolute;
+                                        left: calc(55% - 7px);
+                                        top: -4.5px;
+                                        border: 2px solid #fff;
+                                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+                                    "
+                                ></div>
+                            </div>
+                            <span class="el-label">Slider</span>
+                        </div>
+                        <div class="el-row" data-name="button cta">
+                            <div
+                                style="
+                                    background: #5b6cf8;
+                                    color: #fff;
+                                    font-size: 10px;
+                                    padding: 4px 10px;
+                                    border-radius: 5px;
+                                    font-weight: 600;
+                                    flex-shrink: 0;
+                                "
+                            >
+                                Click me
+                            </div>
+                            <span class="el-label">Button</span>
+                        </div>
+                        <div class="el-row" data-name="text input field">
+                            <div
+                                style="
+                                    flex: 1;
+                                    border: 1px solid #ccc;
+                                    border-radius: 5px;
+                                    padding: 4px 7px;
+                                    font-size: 10px;
+                                    color: #999;
+                                "
+                            >
+                                Type here...
+                            </div>
+                            <span class="el-label">Input</span>
+                        </div>
+                        <div class="el-row" data-name="dropdown select menu">
+                            <div
+                                style="
+                                    flex: 1;
+                                    border: 1px solid #ccc;
+                                    border-radius: 5px;
+                                    padding: 4px 7px;
+                                    font-size: 10px;
+                                    color: #555;
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                "
+                            >
+                                Select<svg
+                                    width="8"
+                                    height="8"
+                                    viewBox="0 0 10 6"
+                                >
+                                    <polyline
+                                        points="1,1 5,5 9,1"
+                                        fill="none"
+                                        stroke="#555"
+                                        stroke-width="1.5"
+                                    />
+                                </svg>
+                            </div>
+                            <span class="el-label">Dropdown</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- BADGES & TAGS -->
+                <div class="section" data-cat="deco">
+                    <div class="section-header">
+                        <span class="section-title">Badges &amp; tags</span>
+                        <span class="see-all">See all</span>
+                    </div>
+                    <div class="badges">
+                        <span
+                            class="badge"
+                            style="background: #eef0ff; color: #534ab7"
+                            >New</span
+                        >
+                        <span
+                            class="badge"
+                            style="background: #e1f5ee; color: #0f6e56"
+                            >Sale</span
+                        >
+                        <span
+                            class="badge"
+                            style="background: #faece7; color: #993c1d"
+                            >Hot 🔥</span
+                        >
+                        <span
+                            class="badge"
+                            style="background: #faeeda; color: #854f0b"
+                            >Pro ⭐</span
+                        >
+                        <span
+                            class="badge"
+                            style="background: #fcebeb; color: #a32d2d"
+                            >Live</span
+                        >
+                        <span
+                            class="badge"
+                            style="background: #e6f1fb; color: #185fa5"
+                            >Beta</span
+                        >
+                        <span
+                            class="badge"
+                            style="background: #fbeaf0; color: #993556"
+                            >Trending</span
+                        >
+                        <span
+                            class="badge"
+                            style="background: #eaf3de; color: #3b6d11"
+                            >Free</span
+                        >
+                        <span
+                            class="badge"
+                            style="background: #1a1a1a; color: #fff"
+                            >Dark</span
+                        >
+                        <span
+                            class="badge"
+                            style="
+                                background: #fff;
+                                color: #1a1a1a;
+                                border: 1px solid #ccc;
+                            "
+                            >Light</span
+                        >
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- DECORATIONS -->
+                <div class="section" data-cat="deco">
+                    <div class="section-header">
+                        <span class="section-title">Decorations</span>
+                        <span class="see-all">See all</span>
+                    </div>
+                    <div class="grid-2">
+                        <div class="el-row" data-name="search bar decoration">
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="2"
+                            >
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <span class="el-label">Search bar</span>
+                        </div>
+                        <div class="el-row" data-name="star rating">
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                stroke="#555"
+                                fill="#555"
+                                stroke-width="1"
+                            >
+                                <polygon
+                                    points="12,2 15.1,8.3 22,9.3 17,14.1 18.2,21 12,17.8 5.8,21 7,14.1 2,9.3 8.9,8.3"
+                                />
+                            </svg>
+                            <span class="el-label">Star rating</span>
+                        </div>
+                        <div class="el-row" data-name="social media icons">
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <rect
+                                    x="2"
+                                    y="2"
+                                    width="20"
+                                    height="20"
+                                    rx="5"
+                                />
+                                <path
+                                    d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"
+                                />
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                            </svg>
+                            <span class="el-label">Social icons</span>
+                        </div>
+                        <div class="el-row" data-name="divider separator line">
+                            <svg width="14" height="14" viewBox="0 0 24 14">
+                                <line
+                                    x1="2"
+                                    y1="7"
+                                    x2="22"
+                                    y2="7"
+                                    stroke="#555"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                            <span class="el-label">Divider</span>
+                        </div>
+                        <div
+                            class="el-row"
+                            data-name="quote marks text decoration"
+                        >
+                            <svg
+                                width="16"
+                                height="14"
+                                viewBox="0 0 24 20"
+                                fill="#555"
+                            >
+                                <path
+                                    d="M10,2 Q10,9 4,9 Q7,9 7,14 L10,14 L10,20 L4,20 Q0,20 0,14 L0,5 Q0,2 4,2Z"
+                                />
+                                <path
+                                    d="M24,2 Q24,9 18,9 Q21,9 21,14 L24,14 L24,20 L18,20 Q14,20 14,14 L14,5 Q14,2 18,2Z"
+                                />
+                            </svg>
+                            <span class="el-label">Quote</span>
+                        </div>
+                        <div class="el-row" data-name="music audio wave">
+                            <svg
+                                width="16"
+                                height="14"
+                                viewBox="0 0 24 14"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <line x1="2" y1="7" x2="2" y2="7" />
+                                <line x1="5" y1="4" x2="5" y2="10" />
+                                <line x1="8" y1="2" x2="8" y2="12" />
+                                <line x1="11" y1="5" x2="11" y2="9" />
+                                <line x1="14" y1="1" x2="14" y2="13" />
+                                <line x1="17" y1="4" x2="17" y2="10" />
+                                <line x1="20" y1="6" x2="20" y2="8" />
+                            </svg>
+                            <span class="el-label">Wave</span>
+                        </div>
+                        <div
+                            class="el-row"
+                            data-name="confetti celebration decoration"
+                        >
+                            <svg
+                                width="16"
+                                height="14"
+                                viewBox="0 0 24 20"
+                                fill="none"
+                                stroke="#555"
+                                stroke-width="1.8"
+                            >
+                                <circle cx="5" cy="5" r="1.5" fill="#5b6cf8" />
+                                <circle cx="14" cy="3" r="1.5" fill="#e55" />
+                                <rect
+                                    x="18"
+                                    y="8"
+                                    width="3"
+                                    height="3"
+                                    rx="1"
+                                    fill="#f90"
+                                    transform="rotate(30 19.5 9.5)"
+                                />
+                                <circle cx="8" cy="15" r="1.5" fill="#0a6640" />
+                                <rect
+                                    x="2"
+                                    y="13"
+                                    width="3"
+                                    height="3"
+                                    rx="1"
+                                    fill="#f06"
+                                    transform="rotate(20 3.5 14.5)"
+                                />
+                                <circle
+                                    cx="20"
+                                    cy="15"
+                                    r="1.5"
+                                    fill="#185fa5"
+                                />
+                            </svg>
+                            <span class="el-label">Confetti</span>
+                        </div>
+                        <div
+                            class="el-row"
+                            data-name="gradient background color"
+                        >
+                            <div
+                                style="
+                                    width: 16px;
+                                    height: 14px;
+                                    border-radius: 4px;
+                                    background: linear-gradient(
+                                        135deg,
+                                        #5b6cf8,
+                                        #e55ba0
+                                    );
+                                    flex-shrink: 0;
+                                "
+                            ></div>
+                            <span class="el-label">Gradient</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- TABLES & LISTS -->
+                <div class="section" data-cat="ui">
+                    <div class="section-header">
+                        <span class="section-title">Tables &amp; lists</span>
+                        <span class="see-all">See all</span>
+                    </div>
+                    <div class="grid-2">
+                        <div class="el" data-name="data table">
+                            <div
+                                style="
+                                    width: 100%;
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 2px;
+                                "
+                            >
+                                <div
+                                    style="
+                                        height: 7px;
+                                        background: #555;
+                                        border-radius: 2px;
+                                    "
+                                ></div>
+                                <div
+                                    style="
+                                        height: 4px;
+                                        background: #ccc;
+                                        border-radius: 2px;
+                                        width: 95%;
+                                    "
+                                ></div>
+                                <div
+                                    style="
+                                        height: 4px;
+                                        background: #ccc;
+                                        border-radius: 2px;
+                                        width: 90%;
+                                    "
+                                ></div>
+                                <div
+                                    style="
+                                        height: 4px;
+                                        background: #ccc;
+                                        border-radius: 2px;
+                                        width: 97%;
+                                    "
+                                ></div>
+                            </div>
+                            <span class="el-label">Table</span>
+                        </div>
+                        <div class="el" data-name="bullet list">
+                            <div
+                                style="
+                                    width: 100%;
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 4px;
+                                "
+                            >
+                                <div
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 5px;
+                                    "
+                                >
+                                    <div
+                                        style="
+                                            width: 5px;
+                                            height: 5px;
+                                            border-radius: 50%;
+                                            background: #555;
+                                            flex-shrink: 0;
+                                        "
+                                    ></div>
+                                    <div
+                                        style="
+                                            height: 3px;
+                                            background: #ccc;
+                                            border-radius: 2px;
+                                            flex: 1;
+                                        "
+                                    ></div>
+                                </div>
+                                <div
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 5px;
+                                    "
+                                >
+                                    <div
+                                        style="
+                                            width: 5px;
+                                            height: 5px;
+                                            border-radius: 50%;
+                                            background: #555;
+                                            flex-shrink: 0;
+                                        "
+                                    ></div>
+                                    <div
+                                        style="
+                                            height: 3px;
+                                            background: #ccc;
+                                            border-radius: 2px;
+                                            flex: 1;
+                                        "
+                                    ></div>
+                                </div>
+                                <div
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 5px;
+                                    "
+                                >
+                                    <div
+                                        style="
+                                            width: 5px;
+                                            height: 5px;
+                                            border-radius: 50%;
+                                            background: #555;
+                                            flex-shrink: 0;
+                                        "
+                                    ></div>
+                                    <div
+                                        style="
+                                            height: 3px;
+                                            background: #ccc;
+                                            border-radius: 2px;
+                                            flex: 1;
+                                        "
+                                    ></div>
+                                </div>
+                            </div>
+                            <span class="el-label">List</span>
+                        </div>
+                        <div class="el" data-name="numbered list steps">
+                            <div
+                                style="
+                                    width: 100%;
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 4px;
+                                "
+                            >
+                                <div
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 5px;
+                                    "
+                                >
+                                    <div
+                                        style="
+                                            width: 10px;
+                                            height: 10px;
+                                            border-radius: 50%;
+                                            background: #5b6cf8;
+                                            flex-shrink: 0;
+                                            font-size: 7px;
+                                            color: #fff;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            font-weight: 700;
+                                        "
+                                    >
+                                        1
+                                    </div>
+                                    <div
+                                        style="
+                                            height: 3px;
+                                            background: #ccc;
+                                            border-radius: 2px;
+                                            flex: 1;
+                                        "
+                                    ></div>
+                                </div>
+                                <div
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 5px;
+                                    "
+                                >
+                                    <div
+                                        style="
+                                            width: 10px;
+                                            height: 10px;
+                                            border-radius: 50%;
+                                            background: #5b6cf8;
+                                            flex-shrink: 0;
+                                            font-size: 7px;
+                                            color: #fff;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            font-weight: 700;
+                                        "
+                                    >
+                                        2
+                                    </div>
+                                    <div
+                                        style="
+                                            height: 3px;
+                                            background: #ccc;
+                                            border-radius: 2px;
+                                            flex: 1;
+                                        "
+                                    ></div>
+                                </div>
+                                <div
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 5px;
+                                    "
+                                >
+                                    <div
+                                        style="
+                                            width: 10px;
+                                            height: 10px;
+                                            border-radius: 50%;
+                                            background: #5b6cf8;
+                                            flex-shrink: 0;
+                                            font-size: 7px;
+                                            color: #fff;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            font-weight: 700;
+                                        "
+                                    >
+                                        3
+                                    </div>
+                                    <div
+                                        style="
+                                            height: 3px;
+                                            background: #ccc;
+                                            border-radius: 2px;
+                                            flex: 1;
+                                        "
+                                    ></div>
+                                </div>
+                            </div>
+                            <span class="el-label">Numbered</span>
+                        </div>
+                        <div class="el" data-name="timeline steps">
+                            <div
+                                style="
+                                    position: relative;
+                                    padding-left: 10px;
+                                    width: 100%;
+                                "
+                            >
+                                <div
+                                    style="
+                                        position: absolute;
+                                        left: 4px;
+                                        top: 0;
+                                        bottom: 0;
+                                        width: 1.5px;
+                                        background: #ccc;
+                                    "
+                                ></div>
+                                <div
+                                    style="
+                                        display: flex;
+                                        flex-direction: column;
+                                        gap: 5px;
+                                    "
+                                >
+                                    <div
+                                        style="
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 5px;
+                                            position: relative;
+                                        "
+                                    >
+                                        <div
+                                            style="
+                                                width: 7px;
+                                                height: 7px;
+                                                border-radius: 50%;
+                                                background: #5b6cf8;
+                                                position: absolute;
+                                                left: -9px;
+                                            "
+                                        ></div>
+                                        <div
+                                            style="
+                                                height: 3px;
+                                                background: #ccc;
+                                                border-radius: 2px;
+                                                flex: 1;
+                                            "
+                                        ></div>
+                                    </div>
+                                    <div
+                                        style="
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 5px;
+                                            position: relative;
+                                        "
+                                    >
+                                        <div
+                                            style="
+                                                width: 7px;
+                                                height: 7px;
+                                                border-radius: 50%;
+                                                background: #5b6cf8;
+                                                position: absolute;
+                                                left: -9px;
+                                            "
+                                        ></div>
+                                        <div
+                                            style="
+                                                height: 3px;
+                                                background: #ccc;
+                                                border-radius: 2px;
+                                                flex: 1;
+                                            "
+                                        ></div>
+                                    </div>
+                                    <div
+                                        style="
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 5px;
+                                            position: relative;
+                                        "
+                                    >
+                                        <div
+                                            style="
+                                                width: 7px;
+                                                height: 7px;
+                                                border-radius: 50%;
+                                                background: #5b6cf8;
+                                                position: absolute;
+                                                left: -9px;
+                                            "
+                                        ></div>
+                                        <div
+                                            style="
+                                                height: 3px;
+                                                background: #ccc;
+                                                border-radius: 2px;
+                                                flex: 1;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="el-label">Timeline</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="height: 12px"></div>
+            </div>
+            <!-- /panel-body -->
+        </div>
+        <!-- /panel -->
+
+        <!-- ── INFO COLUMN ── -->
+        <div class="info">
+            <div>
+                <h2>Elements Panel</h2>
+                <p style="margin-top: 6px">
+                    A Canva-style element picker for your mockup website. Click
+                    any element to "add" it to your canvas.
+                </p>
+            </div>
+
+            <div
+                id="selected-msg"
+                style="
+                    display: none;
+                    background: #eef0ff;
+                    border: 1px solid #d0d5ff;
+                    border-radius: 8px;
+                    padding: 10px 12px;
+                    font-size: 13px;
+                    color: #534ab7;
+                    font-weight: 500;
+                "
+            ></div>
+
+            <p style="font-size: 12px; color: #999; margin-top: 4px">
+                Categories included:
+            </p>
+            <div class="cat-list">
+                <div class="cat-item">
+                    <strong>Shapes</strong> — circle, square, rect, triangle,
+                    star, blob, hexagon, diamond, pentagon, pill, cross, arrow
+                </div>
+                <div class="cat-item">
+                    <strong>Frames</strong> — phone, laptop, browser, iPad,
+                    circle, iMac, polaroid, TV
+                </div>
+                <div class="cat-item">
+                    <strong>Lines & arrows</strong> — line, arrow, curve,
+                    dashed, double, wavy, dotted, elbow
+                </div>
+                <div class="cat-item">
+                    <strong>Icons</strong> — home, search, user, heart, email,
+                    pin, clock, phone, share, settings, bell, lock
+                </div>
+                <div class="cat-item">
+                    <strong>Charts</strong> — bar, line, pie, donut, area,
+                    radar, gauge, scatter
+                </div>
+                <div class="cat-item">
+                    <strong>UI elements</strong> — progress, toggle, checkbox,
+                    radio, slider, button, input, dropdown
+                </div>
+                <div class="cat-item">
+                    <strong>Badges & tags</strong> — New, Sale, Hot, Pro, Live,
+                    Beta, Trending, Free, Dark, Light
+                </div>
+                <div class="cat-item">
+                    <strong>Decorations</strong> — search bar, star rating,
+                    social icons, divider, quote, wave, confetti, gradient
+                </div>
+                <div class="cat-item">
+                    <strong>Tables & lists</strong> — table, bullet list,
+                    numbered list, timeline
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Tab switching
+            function switchTab(el, cat) {
+                document
+                    .querySelectorAll(".tab")
+                    .forEach((t) => t.classList.remove("active"));
+                el.classList.add("active");
+                const sections = document.querySelectorAll(
+                    "#panel-body .section, #panel-body .divider",
+                );
+                if (cat === "all") {
+                    sections.forEach((s) => (s.style.display = ""));
+                } else {
+                    document
+                        .querySelectorAll("#panel-body .section")
+                        .forEach((s) => {
+                            s.style.display =
+                                s.dataset.cat === cat ? "" : "none";
+                        });
+                    document
+                        .querySelectorAll("#panel-body .divider")
+                        .forEach((d) => (d.style.display = "none"));
+                }
+            }
+
+            // Search filter
+            function filterElements(q) {
+                const clearBtn = document.getElementById("clear-btn");
+                clearBtn.style.display = q ? "block" : "none";
+                const term = q.toLowerCase().trim();
+                const allEls = document.querySelectorAll(".el, .el-row");
+                const sections = document.querySelectorAll(
+                    "#panel-body .section",
+                );
+                const dividers = document.querySelectorAll(
+                    "#panel-body .divider",
+                );
+
+                // Reset tabs
+                document
+                    .querySelectorAll(".tab")
+                    .forEach((t) => t.classList.remove("active"));
+                document.querySelector(".tab").classList.add("active");
+
+                if (!term) {
+                    allEls.forEach((e) => (e.style.display = ""));
+                    sections.forEach((s) => (s.style.display = ""));
+                    dividers.forEach((d) => (d.style.display = ""));
+                    return;
+                }
+
+                allEls.forEach((el) => {
+                    const name = (el.dataset.name || "").toLowerCase();
+                    const label = (
+                        el.querySelector(".el-label")?.textContent || ""
+                    ).toLowerCase();
+                    el.style.display =
+                        name.includes(term) || label.includes(term)
+                            ? ""
+                            : "none";
+                });
+
+                sections.forEach((s) => {
+                    const visible = [
+                        ...s.querySelectorAll(".el, .el-row"),
+                    ].some((e) => e.style.display !== "none");
+                    s.style.display = visible ? "" : "none";
+                });
+                dividers.forEach((d) => (d.style.display = "none"));
+            }
+
+            function clearSearch() {
+                document.getElementById("search").value = "";
+                filterElements("");
+            }
+
+            // Click feedback
+            document.querySelectorAll(".el, .el-row, .badge").forEach((el) => {
+                el.addEventListener("click", () => {
+                    const name =
+                        el.dataset.name ||
+                        el.querySelector(".el-label")?.textContent ||
+                        el.textContent;
+                    const msg = document.getElementById("selected-msg");
+                    msg.style.display = "block";
+                    msg.textContent = "+ Added: " + name.trim();
+                    setTimeout(() => (msg.style.display = "none"), 2500);
+                });
+            });
+        </script>
+    </body>
+</html>

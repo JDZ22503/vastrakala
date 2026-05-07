@@ -9,16 +9,21 @@ class GalleryController extends Controller
     public function index()
     {
         $categories = \App\Models\Category::with('galleries.primaryImage')->get();
-        $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
 
-        return view('gallery', compact('categories', 'settings'));
+        return view('gallery', compact('categories'));
     }
 
     public function show($slug)
     {
         $item = \App\Models\Gallery::with(['category', 'images'])->where('slug', $slug)->firstOrFail();
-        $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+        
+        // Item 8: Cross-Selling (Relatable items)
+        $relatedItems = \App\Models\Gallery::where('category_id', $item->category_id)
+            ->where('id', '!=', $item->id)
+            ->with(['category', 'primaryImage'])
+            ->take(4)
+            ->get();
 
-        return view('gallery-show', compact('item', 'settings'));
+        return view('gallery-show', compact('item', 'relatedItems'));
     }
 }

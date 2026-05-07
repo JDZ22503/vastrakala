@@ -85,9 +85,17 @@
                     </div>
 
                     <!-- Bottom Content Section -->
+                    <div class="form-group mb-8">
+                        <label class="block text-sm font-bold text-[#7E635A] mb-2">Technical Description</label>
+                        <textarea name="description" rows="4" placeholder="Size, material, and other technical details..." class="w-full border-gray-300 focus:border-[#D1A392] focus:ring-[#D1A392] rounded-[20px] shadow-sm resize-none p-4">{{ $gallery->description }}</textarea>
+                    </div>
+
                     <div class="form-group">
-                        <label class="block text-sm font-bold text-[#7E635A] mb-2">Description / Art Story</label>
-                        <textarea name="description" rows="5" placeholder="Tell the story of this creation..." class="w-full border-gray-300 focus:border-[#D1A392] focus:ring-[#D1A392] rounded-[20px] shadow-sm resize-none p-4">{{ $gallery->description }}</textarea>
+                        <label class="block text-sm font-bold text-[#7E635A] mb-2">Behind the Craft (Artisan's Story)</label>
+                        <textarea name="artisan_note" rows="6" placeholder="Share the soulful story, the inspiration, or the journey behind this piece..." class="w-full border-gray-300 focus:border-[#D1A392] focus:ring-[#D1A392] rounded-[20px] shadow-sm resize-none p-4 bg-[#FCF8F3]/50 border-double border-2 border-[#D1A392]/30" style="font-style: italic;">{{ $gallery->artisan_note }}</textarea>
+                        <p class="text-[0.7rem] text-[#D1A392] mt-2 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-feather-pointed"></i> This storytelling section helps build trust and increases organic reach on Google.
+                        </p>
                     </div>
 
                     <div class="mt-12">

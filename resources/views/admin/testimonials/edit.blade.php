@@ -4,8 +4,8 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white rounded-[40px] shadow-sm p-10">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-[40px] p-12 border border-[#D1A392]/20">
                 <h1 class="text-2xl font-bold text-[#4A403A] mb-8" style="font-family: 'Playfair Display', serif;">Modify Feedback</h1>
 
                 <form action="{{ route('admin.testimonials.update', $testimonial->id) }}" method="POST" enctype="multipart/form-data">
@@ -53,8 +53,8 @@
                         <x-input-error :messages="$errors->get('content')" class="mt-2" />
                     </div>
 
-                    <div class="flex items-center justify-end">
-                        <a href="{{ route('admin.testimonials.index') }}" class="mr-4 text-[#7E635A] hover:underline">Cancel</a>
+                    <div class="flex items-center justify-end gap-8">
+                        <a href="{{ route('admin.testimonials.index') }}" class="text-[#7E635A] hover:text-[#D1A392] transition-colors font-semibold">Cancel</a>
                         <x-primary-button>
                             {{ __('Update Testimonial') }}
                         </x-primary-button>

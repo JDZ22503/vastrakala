@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Share settings with all views
+        if (!app()->runningInConsole()) {
+            \Illuminate\Support\Facades\View::share('settings', \App\Models\Setting::pluck('value', 'key')->toArray());
+        }
     }
 }

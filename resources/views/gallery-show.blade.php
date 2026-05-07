@@ -19,11 +19,11 @@
     }
     .swiper-main {
         width: 100%;
-        aspect-ratio: 1/1;
+        aspect-ratio: 3/4;
         border-radius: 40px;
         box-shadow: var(--shadow-soft);
-        border: 8px solid white;
-        background: white;
+        border: 8px solid var(--surface-card);
+        background: var(--surface-card);
     }
     .swiper-main img {
         width: 100%;
@@ -50,7 +50,7 @@
         aspect-ratio: 1/1;
         object-fit: cover;
         border-radius: 15px;
-        border: 3px solid white;
+        border: 3px solid var(--surface-card);
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     .swiper-thumbs .swiper-slide-thumb-active .thumb-img {
@@ -124,7 +124,7 @@
 
 @section('content')
 <section class="section detail-page-section">
-    <div class="container mt-sm-10">
+    <div class="container mt-5 mt-sm-10">
         <a href="{{ route('gallery') }}" class="back-link">
             <i class="fas fa-arrow-left"></i> Back to Gallery
         </a>
@@ -137,7 +137,7 @@
                         <div class="swiper-wrapper">
                             @foreach($item->images as $photo)
                                 <div class="swiper-slide">
-                                    <img src="{{ asset($photo->image_path) }}" alt="{{ $item->title }}" />
+                                    <img src="{{ asset($photo->image_path) }}" alt="{{ $item->title }} - Original Handmade Design by VastraKala" loading="lazy" />
                                 </div>
                             @endforeach
                         </div>
@@ -149,7 +149,7 @@
                             <div class="swiper-wrapper">
                                 @foreach($item->images as $photo)
                                     <div class="swiper-slide">
-                                        <img src="{{ asset($photo->image_path) }}" class="thumb-img" />
+                                        <img src="{{ asset($photo->image_path) }}" alt="{{ $item->title }} Thumb" class="thumb-img" loading="lazy" />
                                     </div>
                                 @endforeach
                             </div>
@@ -187,6 +187,67 @@
                 </div>
             </div>
         </div>
+
+        @if($item->artisan_note)
+        <!-- Item 6: Behind the Craft (Storytelling) -->
+        <div class="behind-the-craft-section" style="margin-top: 8rem; position: relative; background: var(--surface-card); border-radius: 60px; box-shadow: var(--shadow-soft); border: 1px solid var(--glass-border); overflow: hidden;">
+            <!-- Responsive Padding Wrapper -->
+            <div class="p-4 p-md-5 py-md-10" style="position: relative; z-index: 1;">
+                <div class="decorative-icon d-none d-md-block" style="position: absolute; top: -50px; right: -50px; font-size: 20rem; color: var(--accent-main); z-index: -1; font-family: 'Playfair Display', serif; transform: rotate(-10deg); opacity: 0.05; pointer-events: none;">
+                    <i class="fa-solid fa-feather-pointed"></i>
+                </div>
+            
+                <div style="position: relative; z-index: 1; max-width: 900px; margin: 0 auto; text-align: center;">
+                    <span class="ls-3" style="font-family: var(--font-body); text-transform: uppercase; color: var(--accent-gold); font-weight: 800; font-size: 0.75rem; display: block; margin-bottom: 1.5rem;">The Soul of the Art</span>
+                    <h2 style="font-family: var(--font-heading); font-size: clamp(2.5rem, 5vw, 4rem); color: var(--text-header); margin-bottom: 3rem; line-height: 1.1;">Behind the Artistry</h2>
+                    
+                    <div class="artisan-story-content" style="font-size: clamp(1.2rem, 3vw, 1.6rem); line-height: 1.9; color: var(--text-header); font-family: var(--font-heading); font-style: italic; opacity: 0.95;">
+                        <i class="fa-solid fa-quote-left" style="color: var(--accent-gold); margin-bottom: 2rem; display: block; font-size: 2.5rem;"></i>
+                        {!! nl2br(e($item->artisan_note)) !!}
+                    </div>
+                    
+                    <div style="margin-top: 4rem; display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
+                        <div style="width: 60px; height: 1px; background: var(--accent-gold); opacity: 0.5;"></div>
+                        <span style="font-family: var(--font-body); font-weight: 800; color: var(--accent-main); text-transform: uppercase; letter-spacing: 3px; font-size: 0.7rem;">Artisan's Personal Note</span>
+                        <div style="width: 60px; height: 1px; background: var(--accent-gold); opacity: 0.5;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Item 8: Shop the Look / Related Pieces -->
+        @if($relatedItems->count() > 0)
+        <div class="related-pieces-section" style="margin-top: 10rem; margin-bottom: 5rem;">
+            <div style="text-align: center; margin-bottom: 4rem;">
+                <h3 style="font-family: var(--font-heading); font-size: 2.8rem; color: var(--text-header);">Related Masterpieces</h3>
+                <div style="width: 50px; height: 3px; background: var(--accent-gold); margin: 15px auto;"></div>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                @foreach($relatedItems as $related)
+                <div class="col-6 col-md-3">
+                    <div class="related-card" style="background: var(--surface-card); border-radius: 30px; padding: 1.2rem; box-shadow: var(--shadow-soft); border: 1px solid var(--glass-border); transition: var(--transition); height: 100%;">
+                        <a href="{{ route('gallery.show', $related->slug) }}" style="text-decoration: none; color: inherit;">
+                            <div style="aspect-ratio: 3/4; border-radius: 20px; overflow: hidden; margin-bottom: 1.2rem; background: var(--surface-main);">
+                                @if($related->primaryImage)
+                                    <img src="{{ asset($related->primaryImage->image_path) }}" 
+                                         alt="{{ $related->title }} - More from VastraKala" 
+                                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;"
+                                         onmouseover="this.style.transform='scale(1.1)'"
+                                         onmouseout="this.style.transform='scale(1)'"
+                                         loading="lazy">
+                                @endif
+                            </div>
+                            <span style="font-size: 0.65rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: 0.3rem;">{{ $related->category->name }}</span>
+                            <h5 style="font-family: var(--font-heading); font-size: 1rem; color: var(--text-header); margin-bottom: 0;">{{ $related->title }}</h5>
+                        </a>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
     </div>
 </section>
 

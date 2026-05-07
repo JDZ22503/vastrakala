@@ -24,12 +24,20 @@
                         {{ __('Gallery Management') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('admin.mockup_pro')" :active="request()->routeIs('admin.mockup_pro')">
+                        <i class="fa-solid fa-wand-magic-sparkles me-1 text-primary"></i> {{ __('Mockup Pro') }}
+                    </x-nav-link>
+
                     <x-nav-link :href="route('admin.testimonials.index')" :active="request()->routeIs('admin.testimonials.*')">
                         {{ __('Testimonials') }}
                     </x-nav-link>
 
                     <x-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.index')">
                         {{ __('Site Settings') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('admin.referrals.index')" :active="request()->routeIs('admin.referrals.*')">
+                        {{ __('Referrals') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -95,8 +103,16 @@
                 {{ __('Gallery Management') }}
             </x-responsive-nav-link>
 
+            <x-responsive-nav-link :href="route('admin.mockup_pro')" :active="request()->routeIs('admin.mockup_pro')">
+                {{ __('Mockup Pro') }}
+            </x-responsive-nav-link>
+
             <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.index')">
                 {{ __('Site Settings') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('admin.referrals.index')" :active="request()->routeIs('admin.referrals.*')">
+                {{ __('Referrals') }}
             </x-responsive-nav-link>
         </div>
 

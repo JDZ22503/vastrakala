@@ -16,6 +16,16 @@ class TestimonialController extends Controller
         return view('admin.testimonials.index', compact('testimonials'));
     }
 
+    public function toggleApproval(Testimonial $testimonial)
+    {
+        $testimonial->update([
+            'is_approved' => !$testimonial->is_approved
+        ]);
+
+        $status = $testimonial->is_approved ? 'approved' : 'unapproved';
+        return back()->with('success', "Testimonial has been {$status} successfully.");
+    }
+
     public function create()
     {
         return view('admin.testimonials.create');

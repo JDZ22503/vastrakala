@@ -32,14 +32,15 @@ class GalleryManagerController extends Controller
             'category_id' => 'required|exists:categories,id',
             'title' => 'required|string|max:255',
             'images' => 'required|array|min:1',
-            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:3072',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:5120',
             'badge' => 'nullable|string|max:50',
             'description' => 'nullable|string',
+            'artisan_note' => 'nullable|string',
         ], [
             'images.required' => 'Please upload at least one image.',
             'images.*.image' => 'The file must be an image.',
             'images.*.mimes' => 'The file must be a valid image format (jpeg, png, jpg, webp).',
-            'images.*.max' => 'The file must not be larger than 3MB.',
+            'images.*.max' => 'The file must not be larger than 5MB.',
         ]);
 
         $gallery = Gallery::create([
@@ -48,19 +49,44 @@ class GalleryManagerController extends Controller
             'slug' => Str::slug($request->title).'-'.time(),
             'badge' => $request->badge,
             'description' => $request->description,
+            'artisan_note' => $request->artisan_note,
         ]);
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $file) {
-                $path = $file->store('gallery', 'public');
-                $gallery->images()->create([
-                    'image_path' => 'storage/'.$path,
-                    'sort_order' => $index,
-                ]);
+                // Item 9: Image Optimization (Converting to WebP)
+                $filename = Str::random(20) . '.webp';
+                $path = 'gallery/' . $filename;
+                
+                // Create image from original
+                $image = match($file->getClientOriginalExtension()) {
+                    'jpg', 'jpeg' => imagecreatefromjpeg($file->getRealPath()),
+                    'png' => imagecreatefrompng($file->getRealPath()),
+                    'webp' => imagecreatefromwebp($file->getRealPath()),
+                    default => null
+                };
+
+                if ($image) {
+                    // Convert palette-based images to true color
+                    imagepalettetotruecolor($image);
+                    
+                    // Save as WebP with 80% quality
+                    ob_start();
+                    imagewebp($image, null, 80);
+                    $content = ob_get_clean();
+                    imagedestroy($image);
+                    
+                    Storage::disk('public')->put($path, $content);
+                    
+                    $gallery->images()->create([
+                        'image_path' => 'storage/'.$path,
+                        'sort_order' => $index,
+                    ]);
+                }
             }
         }
 
-        return redirect()->route('admin.gallery.index')->with('success', 'New creation added with its photos! ');
+        return redirect()->route('admin.gallery.index')->with('success', 'New creation added with optimized photos! ');
     }
 
     public function edit(Gallery $gallery)
@@ -76,14 +102,15 @@ class GalleryManagerController extends Controller
         $request->validate([
             'category_id' => 'required|exists:categories,id',
             'title' => 'required|string|max:255',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'badge' => 'nullable|string|max:50',
             'description' => 'nullable|string',
+            'artisan_note' => 'nullable|string',
         ], [
             'images.required' => 'Please upload at least one image.',
             'images.*.image' => 'The file must be an image.',
             'images.*.mimes' => 'The file must be a valid image format (jpeg, png, jpg, webp).',
-            'images.*.max' => 'The file must not be larger than 3MB.',
+            'images.*.max' => 'The file must not be larger than 5MB.',
         ]);
 
         $gallery->update([
@@ -92,6 +119,7 @@ class GalleryManagerController extends Controller
             'slug' => Str::slug($request->title).'-'.$gallery->id,
             'badge' => $request->badge,
             'description' => $request->description,
+            'artisan_note' => $request->artisan_note,
         ]);
 
         if ($request->hasFile('images')) {
@@ -100,11 +128,32 @@ class GalleryManagerController extends Controller
 
             // Store new files (ADDITIVE)
             foreach ($request->file('images') as $index => $file) {
-                $path = $file->store('gallery', 'public');
-                $gallery->images()->create([
-                    'image_path' => 'storage/'.$path,
-                    'sort_order' => $maxSort + $index + 1,
-                ]);
+                // Item 9: Image Optimization (Converting to WebP)
+                $filename = Str::random(20) . '.webp';
+                $path = 'gallery/' . $filename;
+                
+                $image = match($file->getClientOriginalExtension()) {
+                    'jpg', 'jpeg' => imagecreatefromjpeg($file->getRealPath()),
+                    'png' => imagecreatefrompng($file->getRealPath()),
+                    'webp' => imagecreatefromwebp($file->getRealPath()),
+                    default => null
+                };
+
+                if ($image) {
+                    imagepalettetotruecolor($image);
+                    
+                    ob_start();
+                    imagewebp($image, null, 80);
+                    $content = ob_get_clean();
+                    imagedestroy($image);
+                    
+                    Storage::disk('public')->put($path, $content);
+                    
+                    $gallery->images()->create([
+                        'image_path' => 'storage/'.$path,
+                        'sort_order' => $maxSort + $index + 1,
+                    ]);
+                }
             }
         }
 
@@ -113,10 +162,7 @@ class GalleryManagerController extends Controller
 
     public function deletePhoto(GalleryImage $photo)
     {
-        // Delete physical file
-        Storage::disk('public')->delete(str_replace('storage/', '', $photo->image_path));
-
-        // Delete record
+        // Delete record (Soft Delete)
         $photo->delete();
 
         return response()->json(['success' => true, 'message' => 'Photo deleted!']);
@@ -135,12 +181,8 @@ class GalleryManagerController extends Controller
 
     public function destroy(Gallery $gallery)
     {
-        // Delete related photo files
-        foreach ($gallery->images as $img) {
-            Storage::disk('public')->delete(str_replace('storage/', '', $img->image_path));
-        }
-
-        $gallery->delete(); // Cascades to gallery_images table via DB foreign key
+        // Item is soft deleted and images remain in storage for recovery
+        $gallery->delete(); // Cascades to gallery_images table via SoftDeletes implementation if set up, or just hides the gallery root.
 
         return back()->with('success', 'Creation deleted successfully.');
     }
