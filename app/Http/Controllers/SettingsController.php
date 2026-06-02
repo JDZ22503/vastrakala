@@ -2,28 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class SettingsController extends Controller
 {
     public function index()
     {
-        $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+        $settings = Setting::pluck('value', 'key')->toArray();
+
         return view('settings', compact('settings'));
     }
 
     public function update(Request $request)
     {
-        // Simply process all inputs that come from our form
         $allInputs = $request->except('_token');
-        
+
+        $data = [];
+
         foreach ($allInputs as $key => $value) {
-            \App\Models\Setting::updateOrCreate(
-                ['key' => $key],
-                ['value' => $value]
-            );
+            $data[] = [
+                'key' => $key,
+                'value' => $value,
+            ];
         }
 
-        return back()->with('success', 'Settings updated successfully! ');
+        Setting::upsert(
+            $data,
+            ['key'],      // Unique column
+            ['value']     // Columns to update
+        );
+
+        return back()->with('success', 'Settings updated successfully!');
     }
 }

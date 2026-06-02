@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Gallery;
 use App\Models\GalleryImage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -53,7 +52,6 @@ class GalleryManagerController extends Controller
             'artisan_note' => $request->artisan_note,
         ]);
 
-        $imagesData = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $file) {
                 // Item 9: Image Optimization (Converting to WebP)
@@ -80,19 +78,12 @@ class GalleryManagerController extends Controller
 
                     Storage::disk('public')->put($path, $content);
 
-                    $imagesData[] = [
-                        'gallery_id' => $gallery->id,
+                    $gallery->images()->create([
                         'image_path' => 'storage/'.$path,
                         'sort_order' => $index,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
+                    ]);
                 }
             }
-        }
-
-        if (! empty($imagesData)) {
-            GalleryImage::insert($imagesData);
         }
 
         return redirect()->route('admin.gallery.index')->with('success', 'New creation added with optimized photos! ');
@@ -131,7 +122,6 @@ class GalleryManagerController extends Controller
             'artisan_note' => $request->artisan_note,
         ]);
 
-        $imagesData = [];
         if ($request->hasFile('images')) {
             // Find the current max sort order to append new images at the end
             $maxSort = $gallery->images()->max('sort_order') ?? -1;
@@ -159,19 +149,12 @@ class GalleryManagerController extends Controller
 
                     Storage::disk('public')->put($path, $content);
 
-                    $imagesData[] = [
-                        'gallery_id' => $gallery->id,
+                    $gallery->images()->create([
                         'image_path' => 'storage/'.$path,
                         'sort_order' => $maxSort + $index + 1,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
+                    ]);
                 }
             }
-        }
-
-        if (! empty($imagesData)) {
-            GalleryImage::insert($imagesData);
         }
 
         return redirect()->route('admin.gallery.index')->with('success', 'Creation updated successfully.');
@@ -189,11 +172,9 @@ class GalleryManagerController extends Controller
     {
         $request->validate(['order' => 'required|array', 'order.*' => 'exists:gallery_images,id']);
 
-        DB::transaction(function () use ($request) {
-            foreach ($request->order as $index => $id) {
-                GalleryImage::where('id', $id)->update(['sort_order' => $index]);
-            }
-        });
+        foreach ($request->order as $index => $id) {
+            GalleryImage::where('id', $id)->update(['sort_order' => $index]);
+        }
 
         return response()->json(['success' => true, 'message' => 'Order updated!']);
     }

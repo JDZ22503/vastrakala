@@ -98,16 +98,20 @@ class TrackVisitors
                     $device = 'Tablet';
                 }
 
-                VisitorLog::create([
-                    'ip_address' => $request->ip(),
-                    'user_agent' => $userAgent,
-                    'device' => $device,
-                    'os' => $os,
-                    'browser' => $browser,
-                    'url' => $request->fullUrl(),
-                    'method' => $request->method(),
-                    'visited_at' => now(),
-                ]);
+                try {
+                    VisitorLog::create([
+                        'ip_address' => $request->ip(),
+                        'user_agent' => \Illuminate\Support\Str::limit($userAgent, 1000),
+                        'device' => $device,
+                        'os' => $os,
+                        'browser' => $browser,
+                        'url' => \Illuminate\Support\Str::limit($request->fullUrl(), 2000),
+                        'method' => $request->method(),
+                        'visited_at' => now(),
+                    ]);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Visitor tracking failed: ' . $e->getMessage());
+                }
             }
         }
 
