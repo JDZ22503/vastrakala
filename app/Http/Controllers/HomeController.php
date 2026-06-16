@@ -3,36 +3,44 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Gallery;
+use App\Models\Category;
+use App\Models\Testimonial;
+use App\Models\Setting;
+use App\Models\ReferralSharer;
+use App\Models\ReferralVisit;
+use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
     public function index(Request $request)
     {
         // Fetch only products marked as "New Arrival"
-        $galleryItems = \App\Models\Gallery::where('new_arrival', true)->with(['category', 'primaryImage'])->latest()->get();
+        $galleryItems = Gallery::where('new_arrival', true)->with(['category', 'primaryImage'])->latest()->get();
         // If NO items are marked as new arrival, fallback to latest 6 to keep section from being empty
         if ($galleryItems->isEmpty()) {
-            $galleryItems = \App\Models\Gallery::with(['category', 'primaryImage'])->latest()->take(6)->get();
+            $galleryItems = Gallery::with(['category', 'primaryImage'])->latest()->take(6)->get();
         }
-        $categories = \App\Models\Category::all();
-        $testimonials = \App\Models\Testimonial::where('is_approved', true)->latest()->get();
+        $categories = Category::all();
+        $testimonials = Testimonial::where('is_approved', true)->latest()->get();
 
         // --- Referral System Logic ---
         $myReferral = null;
         $myReferralCount = 0;
         $isNewUser = false;
         
+        $settings = Setting::pluck('value', 'key')->toArray();
         if (($settings['show_referral'] ?? '1') == '1') {
             $userIp = $request->ip();
             
             // 1. Handle incoming referral link (?via=CODE)
             if ($request->has('via')) {
                 $friendCode = $request->via;
-                $sharer = \App\Models\ReferralSharer::where('referral_code', $friendCode)->first();
+                $sharer = ReferralSharer::where('referral_code', $friendCode)->first();
                 
                 // Check if the current visitor is different from the person who shared the link
                 if ($sharer && $sharer->ip_address !== $userIp) {
-                    \App\Models\ReferralVisit::firstOrCreate([
+                    ReferralVisit::firstOrCreate([
                         'sharer_id' => $sharer->id,
                         'guest_ip' => $userIp
                     ], [
@@ -40,11 +48,11 @@ class HomeController extends Controller
                     ]);
                     
                     // Update goal status
-                    $count = \App\Models\ReferralVisit::where('sharer_id', $sharer->id)->count();
+                    $count = ReferralVisit::where('sharer_id', $sharer->id)->count();
                     if ($count >= $sharer->target_count && !$sharer->is_completed) {
                         $sharer->update([
                             'is_completed' => true,
-                            'reward_code' => 'GIFT-' . strtoupper(\Illuminate\Support\Str::random(10))
+                            'reward_code' => 'GIFT-' . strtoupper(Str::random(10))
                         ]);
                     }
                 }
@@ -53,32 +61,32 @@ class HomeController extends Controller
             // 2. Identify the Sharer using a Browser ID (Persistent Cookie)
             $browserId = $request->cookie('v_ref_id');
             if (!$browserId) {
-                $browserId = \Illuminate\Support\Str::random(32);
+                $browserId = Str::random(32);
                 $isNewUser = true;
             }
             
-            $myReferral = \App\Models\ReferralSharer::where('browser_id', $browserId)->first();
+            $myReferral = ReferralSharer::where('browser_id', $browserId)->first();
             
             if (!$myReferral) {
-                $myReferral = \App\Models\ReferralSharer::create([
+                $myReferral = ReferralSharer::create([
                     'browser_id' => $browserId,
                     'ip_address' => $userIp,
-                    'referral_code' => strtoupper(\Illuminate\Support\Str::random(6)),
+                    'referral_code' => strtoupper(Str::random(6)),
                     'target_count' => 10
                 ]);
             } else {
                 $myReferral->update(['ip_address' => $userIp]);
                 
                 // If they reached goal but don't have a reward_code yet
-                $count = \App\Models\ReferralVisit::where('sharer_id', $myReferral->id)->count();
+                $count = ReferralVisit::where('sharer_id', $myReferral->id)->count();
                 if ($count >= $myReferral->target_count && !$myReferral->reward_code) {
                     $myReferral->update([
                         'is_completed' => true,
-                        'reward_code' => 'GIFT-' . strtoupper(\Illuminate\Support\Str::random(10))
+                        'reward_code' => 'GIFT-' . strtoupper(Str::random(10))
                     ]);
                 }
             }
-            $myReferralCount = \App\Models\ReferralVisit::where('sharer_id', $myReferral->id)->count();
+            $myReferralCount = ReferralVisit::where('sharer_id', $myReferral->id)->count();
         }
 
         $response = response()->view('home', compact(

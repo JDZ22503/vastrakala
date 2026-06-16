@@ -63,11 +63,11 @@
                             <div class="flex gap-2">
                                 <form action="{{ route('admin.testimonials.toggle_approval', $testimonial->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="p-2 {{ $testimonial->is_approved ? 'text-amber-500 hover:bg-amber-50' : 'text-green-500 hover:bg-green-50' }} rounded-full transition-colors" title="{{ $testimonial->is_approved ? 'Unapprove' : 'Approve' }}">
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-[0.7rem] font-bold rounded-full transition-colors {{ $testimonial->is_approved ? 'text-amber-600 bg-amber-50 hover:bg-amber-100' : 'text-green-600 bg-green-50 hover:bg-green-100' }}" title="{{ $testimonial->is_approved ? 'Unapprove' : 'Approve' }}">
                                         @if($testimonial->is_approved)
-                                            <i class="fa-solid fa-circle-xmark"></i>
+                                            <i class="fa-solid fa-circle-xmark"></i> Disapprove
                                         @else
-                                            <i class="fa-solid fa-circle-check"></i>
+                                            <i class="fa-solid fa-circle-check"></i> Approve
                                         @endif
                                     </button>
                                 </form>

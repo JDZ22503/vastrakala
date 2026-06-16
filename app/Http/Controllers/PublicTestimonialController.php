@@ -19,7 +19,7 @@ class PublicTestimonialController extends Controller
             'customer_designation' => 'nullable|string|max:255',
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string|max:1000',
-            'avatar' => 'nullable|image|max:1024',
+            'avatar' => 'nullable|image|max:10240',
         ]);
 
         $data = [

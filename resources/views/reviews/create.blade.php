@@ -157,6 +157,11 @@
         width: 100%;
         position: relative;
     }
+
+    .form-control.is-invalid {
+        border-color: #dc3545 !important;
+        background-color: #fff8f8 !important;
+    }
 </style>
 @endsection
 
@@ -174,7 +179,7 @@
         <h1 class="section-title">Share Your Experience</h1>
         <p class="section-subtitle">We'd love to hear your thoughts on our hand-painted artistry.</p>
 
-        <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
+        <form id="review-form" action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data" novalidate>
             @csrf
             
             <div class="rating-group mb-5">
@@ -193,7 +198,7 @@
 
             <div class="row g-3">
                 <div class="col-md-6 form-group">
-                    <label for="customer_name" class="form-label">Full Name</label>
+                    <label for="customer_name" class="form-label">Full Name <span class="text-danger">*</span></label>
                     <input type="text" name="customer_name" id="customer_name" class="form-control" placeholder="John Doe" value="{{ old('customer_name') }}" required>
                     @error('customer_name')
                         <span class="text-danger small">{{ $message }}</span>
@@ -206,7 +211,7 @@
             </div>
 
             <div class="form-group mt-3">
-                <label for="comment" class="form-label">Your Review</label>
+                <label for="comment" class="form-label">Your Review <span class="text-danger">*</span></label>
                 <textarea name="comment" id="comment" rows="5" class="form-control" placeholder="Tell us what you liked about our work..." required>{{ old('comment') }}</textarea>
                 @error('comment')
                     <span class="text-danger small">{{ $message }}</span>
@@ -214,7 +219,7 @@
             </div>
 
             <div class="form-group mt-3">
-                <label for="avatar" class="form-label">Your Profile Photo / Product Photo (Optional)</label>
+                <label for="avatar" class="form-label">Your Profile Photo / Product Photo (Optional upto 10MB max size)</label>
                 <input type="file" name="avatar" id="avatar" class="form-control" accept="image/*">
                 <small class="text-muted">Will be displayed next to your review.</small>
                 @error('avatar')
@@ -230,4 +235,86 @@
 </div>
 </section>
 
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('success'))
+            const form = document.querySelector('form[action*="reviews"]');
+            if (form) {
+                form.reset();
+                // Also clear any old values if they are populated
+                form.querySelectorAll('input[type="text"], textarea, input[type="file"]').forEach(input => {
+                    input.value = '';
+                });
+                // Ensure star5 is checked
+                const star5 = document.getElementById('star5');
+                if (star5) {
+                    star5.checked = true;
+                }
+            }
+        @endif
+
+        // Add custom file size method to jQuery validation
+        $.validator.addMethod('maxSize', function(value, element, param) {
+            return this.optional(element) || (element.files[0] && element.files[0].size <= param);
+        }, 'File size must be less than {0} bytes');
+
+        // Add custom file extension method
+        $.validator.addMethod('extension', function(value, element, param) {
+            param = typeof param === "string" ? param.replace(/,/g, '|') : "png|jpe?g|gif|webp";
+            return this.optional(element) || value.match(new RegExp(".(" + param + ")$", "i"));
+        }, 'Please enter a value with a valid extension.');
+
+        // Initialize jQuery Validation
+        $('#review-form').validate({
+            rules: {
+                customer_name: {
+                    required: true,
+                    minlength: 2,
+                    maxlength: 255
+                },
+                customer_designation: {
+                    maxlength: 255
+                },
+                comment: {
+                    required: true,
+                    minlength: 10,
+                    maxlength: 1000
+                },
+                avatar: {
+                    extension: "jpg|jpeg|png|webp|gif",
+                    maxSize: 10 * 1024 * 1024 // 10MB in bytes
+                }
+            },
+            messages: {
+                customer_name: {
+                    required: "Please enter your full name.",
+                    minlength: "Your name must be at least 2 characters long."
+                },
+                comment: {
+                    required: "Please enter your review comment.",
+                    minlength: "Your review must be at least 10 characters long."
+                },
+                avatar: {
+                    extension: "Please upload a valid image file (jpg, jpeg, png, webp, gif).",
+                    maxSize: "The profile/product image size must not exceed 10MB."
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger small mt-1 d-block',
+            highlight: function(element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            },
+            errorPlacement: function(error, element) {
+                // Insert error message directly after the input/textarea element
+                error.insertAfter(element);
+            }
+        });
+    });
+</script>
 @endsection

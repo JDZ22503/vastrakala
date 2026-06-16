@@ -38,10 +38,10 @@ class TestimonialController extends Controller
             'customer_designation' => 'nullable|string|max:255',
             'content' => 'required|string',
             'rating' => 'required|integer|min:1|max:5',
-            'avatar' => 'nullable|image|max:1024',
+            'avatar' => 'nullable|image|max:10240',
         ], [
             'avatar.image' => 'The file must be an image.',
-            'avatar.max' => 'The file must not be larger than 1MB.',
+            'avatar.max' => 'The file must not be larger than 10MB.',
         ]);
 
         $data = $request->all();
@@ -68,7 +68,7 @@ class TestimonialController extends Controller
             'customer_designation' => 'nullable|string|max:255',
             'content' => 'required|string',
             'rating' => 'required|integer|min:1|max:5',
-            'avatar' => 'nullable|image|max:1024',
+            'avatar' => 'nullable|image|max:10240',
         ]);
 
         $data = $request->all();
