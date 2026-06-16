@@ -151,30 +151,48 @@
                 <div class="swiper-wrapper">
                     @foreach($testimonials as $testimonial)
                         <div class="swiper-slide h-auto">
-                            <div class="testimonial-card">
-                                <span class="testimonial-quote" style="color: var(--accent-main)!important;">“</span>
-                                <div>
-                                    <div class="star-rating" style="color: #FFB30E;">
-                                        @for($i=0; $i<$testimonial->rating; $i++)
-                                        <i class="fa-solid fa-star"></i>
-                                        @endfor
-                                    </div>
-                                    <p class="testimonial-content" style="color: var(--text-header);">
-                                        {{ $testimonial->content }}
-                                    </p>
-                                </div>
-                                
-                                <div class="testimonial-author mt-4 pt-3" style="color: var(--text-header);">
-                                    @if($testimonial->avatar_path)
-                                        <img src="{{ asset($testimonial->avatar_path) }}" alt="{{ $testimonial->customer_name }}" class="testimonial-avatar">
-                                    @else
-                                        <div class="testimonial-avatar-placeholder">
-                                            {{ substr($testimonial->customer_name, 0, 1) }}
+                            <div class="testimonial-card-wrapper">
+                                <div class="testimonial-card">
+                                    <!-- Front Side -->
+                                    <div class="testimonial-card-front">
+                                        <span class="testimonial-quote" style="color: var(--accent-main)!important;">“</span>
+                                        <div>
+                                            <div class="star-rating" style="color: #FFB30E;">
+                                                @for($i=0; $i<$testimonial->rating; $i++)
+                                                <i class="fa-solid fa-star"></i>
+                                                @endfor
+                                            </div>
+                                            <p class="testimonial-content" style="color: var(--text-header);">
+                                                {{ $testimonial->content }}
+                                            </p>
                                         </div>
-                                    @endif
-                                    <div class="testimonial-info">
-                                        <h5>{{ $testimonial->customer_name }}</h5>
-                                        <p>{{ $testimonial->customer_designation }}</p>
+                                        
+                                        <div class="testimonial-author mt-4 pt-3" style="color: var(--text-header);">
+                                            @if($testimonial->avatar_path)
+                                                <img src="{{ asset($testimonial->avatar_path) }}" alt="{{ $testimonial->customer_name }}" class="testimonial-avatar">
+                                            @else
+                                                <div class="testimonial-avatar-placeholder">
+                                                    {{ substr($testimonial->customer_name, 0, 1) }}
+                                                </div>
+                                            @endif
+                                            <div class="testimonial-info">
+                                                <h5>{{ $testimonial->customer_name }}</h5>
+                                                <p>{{ $testimonial->customer_designation }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Back Side -->
+                                    <div class="testimonial-card-back">
+                                        @if($testimonial->avatar_path)
+                                            <img src="{{ asset($testimonial->avatar_path) }}" alt="{{ $testimonial->customer_name }}">
+                                        @else
+                                            <div class="testimonial-back-placeholder">
+                                                <i class="fa-solid fa-quote-right"></i>
+                                                <span>{{ $testimonial->customer_name }}</span>
+                                                <p class="small text-muted mt-2">{{ $testimonial->customer_designation }}</p>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -348,6 +366,128 @@
         transform: translateY(-2px);
         box-shadow: 0 15px 30px rgba(126, 98, 88, 0.2);
     }
+
+    /* Testimonial Flip Card Styles */
+    .testimonial-swiper .swiper-slide {
+        overflow: visible !important;
+    }
+    
+    .testimonial-card-wrapper {
+        perspective: 1000px;
+        width: 100%;
+        overflow: visible !important;
+    }
+    
+    .testimonial-card {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transform-style: preserve-3d;
+        cursor: pointer;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+    
+    /* Disable default style.css hover translation */
+    .testimonial-card:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* Only hover-flip on desktop (screens larger than 1024px) */
+    @media (min-width: 1025px) {
+        .testimonial-card-wrapper:hover .testimonial-card {
+            transform: rotateY(180deg) !important;
+        }
+    }
+    
+    /* Flipped class works on all screens (primarily for click/tap trigger) */
+    .testimonial-card.is-flipped {
+        transform: rotateY(180deg) !important;
+    }
+    
+    .testimonial-card-front {
+        position: relative;
+        background: var(--white);
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transform: rotateY(0deg);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        border-radius: 40px;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(209, 163, 146, 0.1);
+        width: 100%;
+        min-height: 420px;
+    }
+    
+    .testimonial-card-back {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        border-radius: 40px;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(209, 163, 146, 0.1);
+        overflow: hidden;
+        background: var(--surface-main);
+        transform: rotateY(180deg);
+    }
+    
+    /* Center cropped image on back side */
+    .testimonial-card-back img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+    
+    .testimonial-back-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--bg-cream) 0%, var(--surface-accent) 100%);
+        color: var(--text-dark);
+        font-size: 1.5rem;
+        font-weight: 700;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .testimonial-back-placeholder i {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        opacity: 0.8;
+    }
+    
+    .testimonial-back-placeholder span {
+        font-family: var(--font-heading);
+        font-size: 1.6rem;
+    }
+    
+    @media (max-width: 768px) {
+        .testimonial-card-front {
+            padding: 2rem 1.5rem;
+            border-radius: 30px;
+            min-height: 340px;
+        }
+        .testimonial-card-back,
+        .testimonial-back-placeholder {
+            border-radius: 30px;
+        }
+    }
 </style>
 @endsection
 
@@ -451,5 +591,48 @@
             span.classList.replace('text-success', 'text-primary');
         }, 2000);
     }
+
+    // Toggle flip on click
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.testimonial-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // If they clicked on a link or button, don't flip
+                if (e.target.closest('a') || e.target.closest('button')) {
+                    return;
+                }
+                this.classList.toggle('is-flipped');
+                
+                // Control swiper autoplay based on flipped state
+                const swiperEl = document.querySelector('.testimonial-swiper');
+                if (swiperEl && swiperEl.swiper) {
+                    const swiperInstance = swiperEl.swiper;
+                    const anyFlipped = document.querySelectorAll('.testimonial-card.is-flipped').length > 0;
+                    if (anyFlipped) {
+                        swiperInstance.autoplay.stop();
+                    } else {
+                        swiperInstance.autoplay.start();
+                    }
+                }
+            });
+        });
+
+        // Explicitly pause carousel autoplay on hover
+        const swiperEl = document.querySelector('.testimonial-swiper');
+        if (swiperEl) {
+            swiperEl.addEventListener('mouseenter', function() {
+                if (this.swiper && this.swiper.autoplay) {
+                    this.swiper.autoplay.stop();
+                }
+            });
+            swiperEl.addEventListener('mouseleave', function() {
+                if (this.swiper && this.swiper.autoplay) {
+                    const anyFlipped = document.querySelectorAll('.testimonial-card.is-flipped').length > 0;
+                    if (!anyFlipped) {
+                        this.swiper.autoplay.start();
+                    }
+                }
+            });
+        }
+    });
 </script>
 @endsection

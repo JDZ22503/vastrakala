@@ -156,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             autoplay: {
                 delay: 4000,
                 disableOnInteraction: false,
+                pauseOnMouseEnter: true,
             },
             pagination: {
                 el: '.swiper-pagination',

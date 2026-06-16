@@ -30,7 +30,7 @@
 
         <!-- Assets -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ time() }}">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script src="{{ asset('js/main.js') }}" type="module" defer></script>
         {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script> --}}
