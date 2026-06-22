@@ -22,7 +22,7 @@ class GalleryManagerController extends Controller
 
     public function create()
     {
-        $categories = Category::all();
+        $categories = Category::orderBy('sort_order', 'asc')->get();
 
         return view('admin.gallery.create', compact('categories'));
     }
@@ -100,7 +100,7 @@ class GalleryManagerController extends Controller
 
     public function edit(Gallery $gallery)
     {
-        $categories = Category::all();
+        $categories = Category::orderBy('sort_order', 'asc')->get();
         $gallery->load('images');
 
         return view('admin.gallery.edit', compact('gallery', 'categories'));

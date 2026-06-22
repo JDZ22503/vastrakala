@@ -64,12 +64,12 @@
                     <!-- Bottom Content Section -->
                     <div class="form-group mb-8">
                         <label class="block text-sm font-bold text-[#7E635A] mb-2">Technical Description</label>
-                        <textarea name="description" rows="4" placeholder="Size, material, and other technical details..." class="w-full border-gray-300 focus:border-[#D1A392] focus:ring-[#D1A392] rounded-[20px] shadow-sm resize-none p-4"></textarea>
+                        <textarea id="summernote-description" name="description" placeholder="Size, material, and other technical details..." class="w-full border-gray-300 focus:border-[#D1A392] focus:ring-[#D1A392] rounded-[20px] shadow-sm resize-none p-4"></textarea>
                     </div>
 
                     <div class="form-group">
                         <label class="block text-sm font-bold text-[#7E635A] mb-2">Behind the Craft (Artisan's Story)</label>
-                        <textarea name="artisan_note" rows="6" placeholder="Share the soulful story, the inspiration, or the journey behind this piece..." class="w-full border-gray-300 focus:border-[#D1A392] focus:ring-[#D1A392] rounded-[20px] shadow-sm resize-none p-4 bg-[#FCF8F3]/50 border-double border-2 border-[#D1A392]/30" style="font-style: italic;"></textarea>
+                        <textarea id="summernote-artisan" name="artisan_note" placeholder="Share the soulful story, the inspiration, or the journey behind this piece..." class="w-full border-gray-300 focus:border-[#D1A392] focus:ring-[#D1A392] rounded-[20px] shadow-sm resize-none p-4 bg-[#FCF8F3]/50 border-double border-2 border-[#D1A392]/30" style="font-style: italic;"></textarea>
                         <p class="text-[0.7rem] text-[#D1A392] mt-2 font-bold flex items-center gap-2">
                             <i class="fa-solid fa-feather-pointed"></i> This storytelling section helps build trust and increases organic reach on Google.
                         </p>
@@ -101,13 +101,111 @@
         }
     </style>
     <script>
-        document.getElementById('image-upload').addEventListener('change', function(event) {
+        // Helper function to compress large files client-side
+        function compressImage(file, maxSizeBytes = 5 * 1024 * 1024) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // Limit maximum dimension to 2048px to prevent huge memory usage and reduce size
+                        const maxDimension = 2048;
+                        if (width > maxDimension || height > maxDimension) {
+                            if (width > height) {
+                                height = Math.round((height * maxDimension) / width);
+                                width = maxDimension;
+                            } else {
+                                width = Math.round((width * maxDimension) / height);
+                                height = maxDimension;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Start with 0.8 quality jpeg
+                        canvas.toBlob((blob) => {
+                            if (!blob) {
+                                resolve(file);
+                                return;
+                            }
+                            
+                            let compressedFile = new File([blob], file.name.substring(0, file.name.lastIndexOf('.')) + '.jpg', {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            
+                            // If still larger than allowed limit, compress further at 0.5 quality
+                            if (compressedFile.size > maxSizeBytes) {
+                                canvas.toBlob((blob2) => {
+                                    if (blob2) {
+                                        compressedFile = new File([blob2], compressedFile.name, {
+                                            type: 'image/jpeg',
+                                            lastModified: Date.now()
+                                        });
+                                    }
+                                    resolve(compressedFile);
+                                }, 'image/jpeg', 0.5);
+                            } else {
+                                resolve(compressedFile);
+                            }
+                        }, 'image/jpeg', 0.8);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('image-upload').addEventListener('change', async function(event) {
             const container = document.getElementById('image-preview');
             container.innerHTML = '';
             
             const files = event.target.files;
-            if (files) {
-                Array.from(files).forEach(file => {
+            if (files && files.length > 0) {
+                const dt = new DataTransfer();
+                let showLoader = false;
+                
+                // Check if any file needs compression (>5MB)
+                for (let file of files) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        showLoader = true;
+                        break;
+                    }
+                }
+                
+                if (showLoader) {
+                    Swal.fire({
+                        title: 'Optimizing Images...',
+                        text: 'Compressing large files to ensure fast upload times.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                }
+                
+                for (let file of files) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        // Compress the file
+                        const compressedFile = await compressImage(file);
+                        dt.items.add(compressedFile);
+                    } else {
+                        dt.items.add(file);
+                    }
+                }
+                
+                // Update file input with compressed list
+                event.target.files = dt.files;
+                
+                // Show previews
+                Array.from(dt.files).forEach(file => {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const img = document.createElement('img');
@@ -117,7 +215,84 @@
                     }
                     reader.readAsDataURL(file);
                 });
+                
+                if (showLoader) {
+                    Swal.close();
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Large images compressed successfully!',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
             }
         });
     </script>
+
+    @push('scripts')
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Summernote Lite CSS/JS -->
+        <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('#summernote-description').summernote({
+                    placeholder: 'Size, material, and other technical details...',
+                    tabsize: 2,
+                    height: 150,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ]
+                });
+                $('#summernote-artisan').summernote({
+                    placeholder: "Share the soulful story, the inspiration, or the journey behind this piece...",
+                    tabsize: 2,
+                    height: 200,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ]
+                });
+            });
+        </script>
+        <style>
+            .note-editor.note-frame {
+                border: 1px solid #D1A392 !important;
+                border-radius: 20px !important;
+                overflow: hidden;
+                background: white !important;
+                font-family: 'Outfit', sans-serif !important;
+            }
+            .note-toolbar {
+                background-color: #FCF8F3 !important;
+                border-bottom: 1px solid #D1A392 !important;
+                padding: 10px !important;
+            }
+            .note-btn {
+                background: white !important;
+                border: 1px solid #D1A392/30 !important;
+                color: #7E635A !important;
+            }
+            .note-btn:hover {
+                background: #FCF8F3 !important;
+            }
+            .note-dropdown-menu {
+                background: white !important;
+            }
+        </style>
+    @endpush
 </x-app-layout>

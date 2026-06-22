@@ -37,7 +37,7 @@
                         <div class="p-6 text-center">
                             <span class="text-[0.7rem] uppercase tracking-widest text-[#D1A392] font-bold mb-1 block">{{ $item->category->name }}</span>
                             <h3 class="font-bold text-[#4A403A] mb-1 truncate">{{ $item->title }}</h3>
-                            <p class="text-xs text-[#7E635A] h-8 overflow-hidden line-clamp-2">{{ $item->description }}</p>
+                            <p class="text-xs text-[#7E635A] h-8 overflow-hidden line-clamp-2">{{ html_entity_decode(strip_tags($item->description), ENT_QUOTES, 'UTF-8') }}</p>
                             <div class="flex justify-between items-center mt-4">
                                 <a href="{{ route('admin.gallery.edit', $item->id) }}" class="text-xs text-[#D1A392] hover:underline font-bold">Edit <i class="fa-solid fa-pen ml-1"></i></a>
                                 <form action="{{ route('admin.gallery.destroy', $item->id) }}" method="POST" class="delete-form">

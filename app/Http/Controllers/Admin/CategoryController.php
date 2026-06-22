@@ -11,7 +11,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::latest()->get();
+        $categories = Category::orderBy('sort_order', 'asc')->get();
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -21,9 +21,13 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:categories,name',
         ]);
 
+        // Get next sort order
+        $maxOrder = Category::max('sort_order') ?? 0;
+
         Category::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'sort_order' => $maxOrder + 1,
         ]);
 
         return back()->with('success', 'New category created successfully! ');
@@ -41,6 +45,20 @@ class CategoryController extends Controller
         ]);
 
         return back()->with('success', 'Category updated successfully.');
+    }
+
+    public function reorder(Request $request)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'integer|exists:categories,id'
+        ]);
+
+        foreach ($request->order as $index => $id) {
+            Category::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Categories reordered successfully!']);
     }
 
     public function destroy(Category $category)

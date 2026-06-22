@@ -45,12 +45,17 @@
                 </div>
 
                 <!-- List Categories -->
-                <div class="md:col-span-2 space-y-4">
+                <div id="sortable-categories" class="md:col-span-2 space-y-4">
                     @forelse($categories as $category)
-                        <div class="bg-white rounded-[20px] overflow-hidden shadow-sm p-6 border border-transparent hover:border-[#D1A392] transition-all flex justify-between items-center">
-                            <div>
-                                <h4 class="font-bold text-[#4A403A] text-lg">{{ $category->name }}</h4>
-                                <span class="text-xs text-[#7E635A] bg-[#FCF8F3] px-2 py-1 rounded-md">{{ $category->slug }}</span>
+                        <div class="category-item bg-white rounded-[20px] overflow-hidden shadow-sm p-4 border border-transparent hover:border-[#D1A392] transition-all flex justify-between items-center" data-id="{{ $category->id }}" style="cursor: move;">
+                            <div class="flex items-center gap-4">
+                                <div class="text-gray-400 cursor-move">
+                                    <i class="fa-solid fa-grip-vertical"></i>
+                                </div>
+                                <div class="flex">
+                                    <h4 class="font-bold text-[#4A403A] text-lg">{{ $category->name }}</h4>
+                                    <span class="text-xs text-[#7E635A] bg-[#FCF8F3] ms-2 px-2 py-1 rounded-md">{{ $category->slug }}</span>
+                                </div>
                             </div>
                             
                             <div class="flex items-center gap-4">
@@ -71,4 +76,51 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <!-- SweetAlert2 (loaded in app layout, but toast mixin is useful) -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+            });
+
+            const el = document.getElementById('sortable-categories');
+            if (el) {
+                new Sortable(el, {
+                    animation: 150,
+                    ghostClass: 'opacity-50',
+                    handle: '.fa-grip-vertical', // drag handle
+                    onEnd: function() {
+                        const items = Array.from(el.querySelectorAll('.category-item'));
+                        const order = items.map(item => item.getAttribute('data-id'));
+                        
+                        fetch("{{ route('admin.categories.reorder') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ order: order })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if(data.success) {
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: data.message
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+    @endpush
 </x-app-layout>

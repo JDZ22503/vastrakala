@@ -13,7 +13,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\PublicTestimonialController;
 use Illuminate\Support\Facades\Route;
 
-// --- VASTRAKALA SUBDOMAIN ROUTES ---
+// // --- VASTRAKALA SUBDOMAIN ROUTES ---
 Route::domain('vastrakala.ayushzalavadiya.me')->group(function () {
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -57,6 +57,7 @@ Route::middleware('auth')->prefix('ayush-admin')->group(function () {
     // Category Management
     Route::get('/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
     Route::post('/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
+    Route::post('/categories/reorder', [CategoryController::class, 'reorder'])->name('admin.categories.reorder');
     Route::patch('/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
     // Testimonial Management

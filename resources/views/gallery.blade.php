@@ -41,7 +41,7 @@
                                         <div class="card-content">
                                             <h3>{{ $item->title }}</h3>
                                             <p style="color: var(--text-light); font-size: 0.9rem;">
-                                                {{ Str::limit($item->description, 80) }}
+                                                {{ Str::limit(html_entity_decode(strip_tags($item->description), ENT_QUOTES, 'UTF-8'), 80) }}
                                             </p>
                                         </div>
                                     </a>

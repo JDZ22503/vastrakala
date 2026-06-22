@@ -168,9 +168,9 @@
                     <span class="detail-badge">{{ $item->badge }}</span>
                 @endif
 
-                <p class="detail-desc">
-                    {{ $item->description }}
-                </p>
+                <div class="detail-desc">
+                    {!! $item->description !!}
+                </div>
 
                 @php
                     $whatsappNumber = preg_replace('/[^0-9]/', '', $settings['whatsapp'] ?? '919510168399');
@@ -203,7 +203,7 @@
                     
                     <div class="artisan-story-content" style="font-size: clamp(1.2rem, 3vw, 1.6rem); line-height: 1.9; color: var(--text-header); font-family: var(--font-heading); font-style: italic; opacity: 0.95;">
                         <i class="fa-solid fa-quote-left" style="color: var(--accent-gold); margin-bottom: 2rem; display: block; font-size: 2.5rem;"></i>
-                        {!! nl2br(e($item->artisan_note)) !!}
+                        {!! $item->artisan_note !!}
                     </div>
                     
                     <div style="margin-top: 4rem; display: flex; align-items: center; justify-content: center; gap: 1.5rem;">

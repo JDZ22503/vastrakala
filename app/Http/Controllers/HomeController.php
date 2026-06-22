@@ -21,7 +21,7 @@ class HomeController extends Controller
         if ($galleryItems->isEmpty()) {
             $galleryItems = Gallery::with(['category', 'primaryImage'])->latest()->take(6)->get();
         }
-        $categories = Category::all();
+        $categories = Category::orderBy('sort_order', 'asc')->get();
         $testimonials = Testimonial::where('is_approved', true)->latest()->get();
 
         // --- Referral System Logic ---
