@@ -19,6 +19,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Force HTTPS in production to fix Mixed Content errors behind Render proxy
+        if (env('APP_ENV') !== 'local') {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         // Share settings with all views
         if (!app()->runningInConsole()) {
             \Illuminate\Support\Facades\View::share('settings', \App\Models\Setting::pluck('value', 'key')->toArray());
