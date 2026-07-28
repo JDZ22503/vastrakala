@@ -1,29 +1,47 @@
-FROM richarvey/nginx-php-fpm:3.1.6
+FROM php:8.4-apache
 
-# Install Node.js and npm for building frontend assets
-RUN apk add --no-cache nodejs npm
+# Install dependencies for PHP extensions and Node.js
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    libpng-dev \
+    libpq-dev \
+    zip \
+    unzip \
+    nodejs \
+    npm
 
+# Install necessary PHP extensions for Laravel
+RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql gd zip
+
+# Enable Apache mod_rewrite for Laravel routing
+RUN a2enmod rewrite
+
+# Change Apache document root to Laravel's public directory
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy the rest of the application
 COPY . .
 
-# Image config
-ENV SKIP_COMPOSER 1
-ENV WEBROOT /var/www/html/public
-ENV PHP_ERRORS_STDERR 1
-ENV RUN_SCRIPTS 1
-ENV REAL_IP_HEADER 1
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Laravel config
-ENV APP_ENV production
-ENV APP_DEBUG false
-ENV LOG_CHANNEL stderr
-
-# Allow composer to run as root
-ENV COMPOSER_ALLOW_SUPERUSER 1
-
-# Install composer dependencies
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Build frontend assets
+# Build Frontend assets
 RUN npm install && npm run build
 
-CMD ["/start.sh"]
+# Fix permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Use our start script
+COPY scripts/start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
+# Run the start script when the container boots
+CMD ["/usr/local/bin/start.sh"]
