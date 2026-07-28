@@ -13,8 +13,8 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\PublicTestimonialController;
 use Illuminate\Support\Facades\Route;
 
-// // --- VASTRAKALA SUBDOMAIN ROUTES ---
-Route::domain('vastrakala.ayushzalavadiya.me')->group(function () {
+// // --- VASTRAKALA ROUTES (Default) ---
+// We removed the strict domain binding so it works on vastrakala.onrender.com and localhost natively.
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery');
@@ -82,7 +82,7 @@ Route::middleware('auth')->prefix('ayush-admin')->group(function () {
 Route::prefix('ayush-admin')->group(function () {
     require __DIR__.'/auth.php';
 });
-});
+// End of VastraKala Routes
 
 Route::domain('ayushzalavadiya.me')->group(function () {
     Route::get('/', [MainPortfolioController::class, 'index'])->name('portfolio');
