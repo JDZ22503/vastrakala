@@ -31,8 +31,12 @@ class PublicTestimonialController extends Controller
         ];
         
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('testimonials', 'public');
-            $data['avatar_path'] = 'storage/' . $path;
+            $file = $request->file('avatar');
+            $filename = 'testimonials/' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $destDir = public_path('storage/testimonials');
+            if (!is_dir($destDir)) mkdir($destDir, 0775, true);
+            $file->move($destDir, basename($filename));
+            $data['avatar_path'] = 'storage/' . $filename;
         }
 
         Testimonial::create($data);

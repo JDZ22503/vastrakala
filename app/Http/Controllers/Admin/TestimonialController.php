@@ -47,8 +47,12 @@ class TestimonialController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('testimonials', 'public');
-            $data['avatar_path'] = 'storage/'.$path;
+            $file = $request->file('avatar');
+            $filename = 'testimonials/' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $destDir = public_path('storage/testimonials');
+            if (!is_dir($destDir)) mkdir($destDir, 0775, true);
+            $file->move($destDir, basename($filename));
+            $data['avatar_path'] = 'storage/' . $filename;
         }
 
         Testimonial::create($data);
@@ -76,10 +80,15 @@ class TestimonialController extends Controller
         if ($request->hasFile('avatar')) {
             // Delete old avatar
             if ($testimonial->avatar_path) {
-                Storage::disk('public')->delete(str_replace('storage/', '', $testimonial->avatar_path));
+                $oldFile = public_path($testimonial->avatar_path);
+                if (file_exists($oldFile)) unlink($oldFile);
             }
-            $path = $request->file('avatar')->store('testimonials', 'public');
-            $data['avatar_path'] = 'storage/'.$path;
+            $file = $request->file('avatar');
+            $filename = 'testimonials/' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $destDir = public_path('storage/testimonials');
+            if (!is_dir($destDir)) mkdir($destDir, 0775, true);
+            $file->move($destDir, basename($filename));
+            $data['avatar_path'] = 'storage/' . $filename;
         }
 
         $testimonial->update($data);

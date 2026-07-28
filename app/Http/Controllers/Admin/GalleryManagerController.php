@@ -78,7 +78,10 @@ class GalleryManagerController extends Controller
                     $content = ob_get_clean();
                     imagedestroy($image);
 
-                    Storage::disk('public')->put($path, $content);
+                    // Write directly to public/storage so no symlink is needed
+                    $destDir = public_path('storage/gallery');
+                    if (!is_dir($destDir)) mkdir($destDir, 0775, true);
+                    file_put_contents($destDir.'/'.$filename, $content);
 
                     $imagesData[] = [
                         'gallery_id' => $gallery->id,
@@ -157,7 +160,10 @@ class GalleryManagerController extends Controller
                     $content = ob_get_clean();
                     imagedestroy($image);
 
-                    Storage::disk('public')->put($path, $content);
+                    // Write directly to public/storage so no symlink is needed
+                    $destDir = public_path('storage/gallery');
+                    if (!is_dir($destDir)) mkdir($destDir, 0775, true);
+                    file_put_contents($destDir.'/'.$filename, $content);
 
                     $imagesData[] = [
                         'gallery_id' => $gallery->id,
