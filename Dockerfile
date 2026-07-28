@@ -5,12 +5,15 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libpng-dev \
     libpq-dev \
+    libjpeg-dev \
+    libwebp-dev \
     zip \
     unzip \
     nodejs \
     npm
 
-# Install necessary PHP extensions for Laravel
+# Install necessary PHP extensions for Laravel (GD with JPEG + WebP support)
+RUN docker-php-ext-configure gd --with-jpeg --with-webp
 RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql gd zip
 
 # Enable Apache mod_rewrite for Laravel routing
