@@ -60,13 +60,8 @@ class GalleryManagerController extends Controller
                 $filename = Str::random(20).'.webp';
                 $path = 'gallery/'.$filename;
 
-                // Create image from original
-                $image = match ($file->getClientOriginalExtension()) {
-                    'jpg', 'jpeg' => imagecreatefromjpeg($file->getRealPath()),
-                    'png' => imagecreatefrompng($file->getRealPath()),
-                    'webp' => imagecreatefromwebp($file->getRealPath()),
-                    default => null
-                };
+                // Auto-detect image type from content (handles misnamed files)
+                $image = imagecreatefromstring(file_get_contents($file->getRealPath()));
 
                 if ($image) {
                     // Convert palette-based images to true color
@@ -145,12 +140,8 @@ class GalleryManagerController extends Controller
                 $filename = Str::random(20).'.webp';
                 $path = 'gallery/'.$filename;
 
-                $image = match ($file->getClientOriginalExtension()) {
-                    'jpg', 'jpeg' => imagecreatefromjpeg($file->getRealPath()),
-                    'png' => imagecreatefrompng($file->getRealPath()),
-                    'webp' => imagecreatefromwebp($file->getRealPath()),
-                    default => null
-                };
+                // Auto-detect image type from content (handles misnamed files)
+                $image = imagecreatefromstring(file_get_contents($file->getRealPath()));
 
                 if ($image) {
                     imagepalettetotruecolor($image);
