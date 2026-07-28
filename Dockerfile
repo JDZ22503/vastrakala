@@ -19,7 +19,9 @@ RUN a2enmod rewrite
 # Change Apache document root to Laravel's public directory
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf || true
+# We need to make sure Apache can read the storage directory outside the document root
+RUN echo "<Directory /var/www/html/storage/app/public>\n    Require all granted\n</Directory>" >> /etc/apache2/apache2.conf
 
 # Set working directory
 WORKDIR /var/www/html
