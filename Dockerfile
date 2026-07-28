@@ -16,12 +16,25 @@ RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql gd zip
 # Enable Apache mod_rewrite for Laravel routing
 RUN a2enmod rewrite
 
-# Change Apache document root to Laravel's public directory
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf || true
-# We need to make sure Apache can read the storage directory outside the document root
-RUN echo "<Directory /var/www/html/storage/app/public>\n    Require all granted\n</Directory>" >> /etc/apache2/apache2.conf
+# Write a clean Apache VirtualHost that:
+# 1. Sets DocumentRoot to Laravel's /public folder
+# 2. Grants access to /var/www/html entirely (covers storage symlinks)
+# 3. Follows symlinks so storage:link works
+RUN { \
+    echo '<VirtualHost *:80>'; \
+    echo '    DocumentRoot /var/www/html/public'; \
+    echo '    <Directory /var/www/html>'; \
+    echo '        AllowOverride All'; \
+    echo '        Require all granted'; \
+    echo '        Options FollowSymLinks'; \
+    echo '    </Directory>'; \
+    echo '    <Directory /var/www/html/public>'; \
+    echo '        AllowOverride All'; \
+    echo '        Require all granted'; \
+    echo '        Options FollowSymLinks'; \
+    echo '    </Directory>'; \
+    echo '</VirtualHost>'; \
+} > /etc/apache2/sites-available/000-default.conf
 
 # Set working directory
 WORKDIR /var/www/html
