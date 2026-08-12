@@ -1,0 +1,22 @@
+kind: wasmer.io/App.v0
+name: ayushweb
+package: .
+env:
+  APP_NAME: "Vastraकला"
+  APP_ENV: production
+  APP_DEBUG: 'false'
+  APP_URL: https://ayushweb.wasmer.app
+  APP_KEY: base64:c4qNk2JIWR1v2c2YH0rR7nfJNegK1+RDz8R3qRQC7qw=
+  DB_CONNECTION: pgsql
+  DB_HOST: aws-1-ap-south-1.pooler.supabase.com
+  DB_PORT: '5432'
+  DB_DATABASE: postgres
+  DB_USERNAME: postgres.zgfvytadjztvnzfzrxdh
+  DB_PASSWORD: ABCxyz@12309
+  SESSION_DRIVER: cookie
+  CACHE_STORE: array
+  QUEUE_CONNECTION: database
+  LOG_CHANNEL: stderr
+  LOG_LEVEL: error
+  FILESYSTEM_DISK: local
+debug: false

@@ -1,0 +1,50 @@
+# Wasmer package exclusions — keeps package small for free tier (1GB limit)
+
+# Include public/.htaccess so phpix routes work
+!public/.htaccess
+
+# Version control
+.git
+.gitattributes
+
+# Dev dependencies — not needed at runtime on Wasmer
+node_modules
+
+# Dev/test files
+tests
+.phpunit.cache
+.phpunit.result.cache
+phpunit.xml
+*.log
+
+# Local env / secrets
+.env
+.env.backup
+.env.production
+.env.production.example
+auth.json
+
+# IDE/editor folders
+.fleet
+.idea
+.nova
+.vscode
+.zed
+.editorconfig
+
+# Build configs not needed at runtime
+vite.config.js
+tailwind.config.js
+postcss.config.js
+package.json
+package-lock.json
+
+# Temp / runtime storage
+storage/logs/*.log
+storage/framework/cache/data/*
+storage/framework/sessions/*
+# Docker / Render config (not needed on Wasmer)
+Dockerfile
+Dockerfile.render
+.dockerignore
+render.yaml

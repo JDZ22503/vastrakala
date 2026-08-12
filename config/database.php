@@ -84,6 +84,23 @@ return [
             ]) : [],
         ],
 
+        'mysql_local' => [
+            'driver' => 'mysql',
+            'url' => env('MYSQL_LOCAL_URL'),
+            'host' => env('MYSQL_LOCAL_HOST', env('MYSQL_HOST', '127.0.0.1')),
+            'port' => env('MYSQL_LOCAL_PORT', env('MYSQL_PORT', '3306')),
+            'database' => env('MYSQL_LOCAL_DATABASE', env('MYSQL_DATABASE', 'ayush_web')),
+            'username' => env('MYSQL_LOCAL_USERNAME', env('MYSQL_USERNAME', 'root')),
+            'password' => env('MYSQL_LOCAL_PASSWORD', env('MYSQL_PASSWORD', '')),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => env('DB_CHARSET', 'utf8mb4'),
+            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL', env('DB_URL')),
@@ -96,7 +113,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => env('DB_SSLMODE', 'prefer'),
+            'sslmode' => env('PGSSLMODE', env('DB_SSLMODE', 'prefer')),
         ],
 
         'sqlsrv' => [

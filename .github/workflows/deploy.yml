@@ -1,0 +1,55 @@
+name: Build & Deploy to Wasmer Edge
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, ctype, iconv, pdo, pdo_pgsql, pgsql, gd, zip, bcmath
+          coverage: none
+
+      - name: Install Composer Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --optimize-autoloader --ignore-platform-reqs
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install NPM Dependencies and Build Assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install Wasmer CLI
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: wasmerio/setup-wasmer@v3
+        with:
+          token: ${{ secrets.WASMER_TOKEN }}
+
+      - name: Deploy to Wasmer Edge
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.WASMER_TOKEN != ''
+        env:
+          WASMER_TOKEN: ${{ secrets.WASMER_TOKEN }}
+        run: |
+          sed -i "s/version = \".*\"/version = \"1.0.${{ github.run_number }}\"/" wasmer.toml
+          wasmer deploy --non-interactive --token $WASMER_TOKEN

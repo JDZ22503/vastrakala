@@ -1,0 +1,20 @@
+[package]
+name = "jdz22503/ayushweb"
+version = "0.1.0"
+description = "Ayush Web Laravel App on Wasmer Edge"
+private = true
+
+[dependencies]
+"php/php" = "=8.3.4"
+
+[fs]
+"/app/" = "."
+
+[[command]]
+name = "webserver"
+module = "php/php:php"
+runner = "wasi"
+
+[command.annotations.wasi]
+main-args = ["-t", "/app/public", "-S", "0.0.0.0:8080", "/app/server.php"]
+env = ["APP_DEBUG=true", "APP_ENV=local"]
